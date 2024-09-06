@@ -9,7 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+<<<<<<< Updated upstream
     "@clerk/nextjs": "^5.4.1",
+=======
+>>>>>>> Stashed changes
     "@tailwindcss/typography": "^0.5.15",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",
