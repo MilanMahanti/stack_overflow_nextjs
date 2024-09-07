@@ -3,26 +3,35 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 interface ThemeContextType {
-  mode: String;
+  mode: string;
   setMode: (mode: string) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState("");
+  const [mode, setMode] = useState("dark");
+
+  // Toggle theme manually
   const handelThemeChange = () => {
-    if (mode === "dark") {
-      setMode("light");
-      document.documentElement.classList.add("light");
-    } else {
+    if (
+      mode === "dark" ||
+      (!localStorage.theme &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches)
+    ) {
       setMode("dark");
       document.documentElement.classList.add("dark");
+    } else {
+      setMode("light");
+      document.documentElement.classList.remove("dark");
     }
   };
+
+  // Apply theme change when `mode` is updated
   useEffect(() => {
     handelThemeChange();
   }, [mode]);
+
   return (
     <ThemeContext.Provider value={{ mode, setMode }}>
       {children}
