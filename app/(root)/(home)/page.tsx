@@ -1,6 +1,6 @@
-import QuestionsCard from "@/components/shared/cards/QuestionsCard";
+import QuestionsCard from "@/components/cards/QuestionsCard";
 import Filter from "@/components/shared/Filter";
-import HomeFilters from "@/components/shared/home/HomeFilters";
+import HomeFilters from "@/components/home/HomeFilters";
 import NoResult from "@/components/shared/NoResult";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { Button } from "@/components/ui/button";
