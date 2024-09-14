@@ -9,7 +9,6 @@ const AskQuestion = async () => {
   // const userId = "CLERK123456";
   if (!userId) redirect("/sign-in");
   const user = await getUser({ userId });
-  console.log(user);
   if (!user) redirect("/sign-in");
   return (
     <div>
