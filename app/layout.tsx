@@ -1,10 +1,10 @@
 import { ClerkProvider } from "@clerk/nextjs";
 // eslint-disable-next-line camelcase
 import { Inter, Space_Grotesk } from "next/font/google";
-import { Metadata } from "next";
 import "./globals.css";
 import React from "react";
 import { ThemeProvider } from "@/context/ThemeProvider";
+import { Metadata } from "next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,7 +16,7 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["300", "400", "500", "600", "700"],
   variable: "--font-spaceGrotesk",
 });
-export const metaData: Metadata = {
+export const metadata: Metadata = {
   title: "DevFlow",
   description:
     "**DevFlow** is a Next.js-powered web application designed for developers to ask and answer programming-related questions, similar to Stack Overflow. It features user authentication, dynamic routing, and a modern, responsive UI. With robust search functionality and real-time updates, DevFlow provides an intuitive platform for developers to collaborate, share knowledge, and solve coding challenges efficiently.",
