@@ -5,9 +5,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const getTimeStamp = (createdAt: Date): string => {
+export const getTimeStamp = (createdAt: string | Date): string => {
+  // Ensure createdAt is a Date object
+  const date = typeof createdAt === "string" ? new Date(createdAt) : createdAt;
+
   const now = new Date();
-  const diff = now.getTime() - createdAt.getTime(); // difference in milliseconds
+  const diff = now.getTime() - date.getTime(); // difference in milliseconds
 
   const seconds = Math.floor(diff / 1000);
   const minutes = Math.floor(seconds / 60);

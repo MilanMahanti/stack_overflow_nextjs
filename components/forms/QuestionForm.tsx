@@ -20,10 +20,19 @@ import { QuestionFromSchema as formSchema } from "@/lib/validations";
 import React, { useRef, useState } from "react";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
+import { createQuestion } from "@/lib/actions/questions.action";
+import { usePathname, useRouter } from "next/navigation";
 
-const QuestionForm = () => {
+interface props {
+  mongoUser: string;
+}
+
+const QuestionForm = ({ mongoUser }: props) => {
   const editorRef = useRef(null);
   const [isSubmmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const path = usePathname();
+  console.log(path);
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -35,12 +44,19 @@ const QuestionForm = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     setIsSubmitting(true);
     try {
-      console.log(values);
+      await createQuestion({
+        title: values.title,
+        explanation: values.explanation,
+        tags: values.tags,
+        author: JSON.parse(mongoUser),
+        path,
+      });
+      router.push("/");
     } catch (error) {
       console.log(error);
     } finally {
@@ -116,7 +132,14 @@ const QuestionForm = () => {
                   apiKey={process.env.NEXT_PUBLIC_TINY_API_KEY}
                   //  @ts-ignore
                   onInit={(_evt, editor) => (editorRef.current = editor)}
-                  initialValue="<p>This is the initial content of the editor.</p>"
+                  onBlur={field.onBlur}
+                  onEditorChange={(content) => {
+                    const tempElement = document.createElement("div");
+                    tempElement.innerHTML = content;
+                    const textContent =
+                      tempElement.innerText || tempElement.textContent; // Extract text content
+                    field.onChange(textContent);
+                  }}
                   init={{
                     height: 350,
                     menubar: false,

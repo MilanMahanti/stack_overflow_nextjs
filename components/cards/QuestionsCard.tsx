@@ -3,12 +3,13 @@ import RenderTag from "../shared/RenderTag";
 import Link from "next/link";
 import Metric from "../shared/Metric";
 import { formatToK, getTimeStamp } from "@/lib/utils";
+
 interface props {
   _id: string;
   title: string;
   tags: {
     _id: string;
-    value: string;
+    name: string;
   }[];
   views: number;
   upvotes: number;
@@ -20,7 +21,7 @@ interface props {
   };
   createdAt: Date;
 }
-const QuestionsCard = ({
+const QuestionsCard = async ({
   _id,
   title,
   tags,
@@ -45,13 +46,13 @@ const QuestionsCard = ({
         </div>
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2 ">
-        {tags.map((tag) => (
-          <RenderTag key={tag._id} _id={tag._id} name={tag.value} />
-        ))}
+        {tags.map(async (tag) => {
+          return <RenderTag key={tag._id} _id={tag._id} name={tag.name} />;
+        })}
       </div>
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
-          imgUrl={author.image}
+          imgUrl="/assets/icons/avatar.svg"
           alt={author.name}
           isAuthor
           href={`/profile/${author._id}`}
