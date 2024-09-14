@@ -55,7 +55,7 @@ export async function deleteUser(params: DeleteUserParams) {
     }
 
     // get all questionids created by the user
-    const getQuestionIds = await Question.find({ author: user._id });
+    await Question.find({ author: user._id });
 
     // delete all questions created by the user
     await Question.deleteMany({ author: user._id });
@@ -64,7 +64,7 @@ export async function deleteUser(params: DeleteUserParams) {
 
     // delete user
     const deletedUser = await User.findByIdAndDelete(user._id);
-    return deleteUser;
+    return deletedUser;
   } catch (error) {
     console.error(error);
     throw error;
