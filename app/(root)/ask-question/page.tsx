@@ -1,13 +1,15 @@
 import QuestionForm from "@/components/forms/QuestionForm";
 import { getUser } from "@/lib/actions/user.action";
-// import { auth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import React from "react";
 
 const AskQuestion = async () => {
-  // const { userId } = auth();
-  const userId = "CLERK123456";
+  const { userId } = auth();
+  // const userId = "CLERK123456";
+  if (!userId) redirect("/sign-in");
   const user = await getUser({ userId });
+  console.log(user);
   if (!user) redirect("/sign-in");
   return (
     <div>

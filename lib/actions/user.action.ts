@@ -5,12 +5,13 @@ import { dbConnect } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetUserByIdParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 
-export async function getUser(params: any) {
+export async function getUser(params: GetUserByIdParams) {
   try {
     dbConnect();
     const { userId } = params;
