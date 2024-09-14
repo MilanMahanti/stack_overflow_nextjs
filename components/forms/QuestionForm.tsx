@@ -32,7 +32,7 @@ const QuestionForm = ({ mongoUser }: props) => {
   const [isSubmmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const path = usePathname();
-  console.log(path);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
