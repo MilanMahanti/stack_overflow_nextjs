@@ -51,12 +51,8 @@ export async function POST(req: Request) {
   }
 
   // Get the ID and type
-  const { id } = evt.data;
   const eventType = evt.type;
-
-  console.log(`Webhook with and ID of ${id} and type of ${eventType}`);
-  console.log("Webhook body:", body);
-
+  console.log(evt.data);
   if (eventType === "user.created") {
     const { id, email_addresses, image_url, username, first_name, last_name } =
       evt.data;
@@ -67,7 +63,7 @@ export async function POST(req: Request) {
       name: `${first_name}${last_name ? ` ${last_name}` : ""}`,
       username: username!,
       email: email_addresses[0].email_address,
-      picture: image_url,
+      profilePhoto: image_url,
     });
 
     return NextResponse.json({ message: "OK", user: mongoUser });
@@ -93,6 +89,7 @@ export async function POST(req: Request) {
   }
 
   if (eventType === "user.deleted") {
+    console.log("User deletion event:", evt.data);
     const { id } = evt.data;
 
     const deletedUser = await deleteUser({

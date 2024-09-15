@@ -3,16 +3,14 @@ import { Document, model, models, Schema } from "mongoose";
 export interface IUser extends Document {
   clerkId: string;
   name: string;
-  userName: string;
+  username: string;
   email: string;
   password?: string;
-  profilePhoto: string;
+  profilePhoto?: string;
   address?: string;
   portfolio?: string;
   joiningDate: Date;
   bio?: string;
-  questions: Schema.Types.ObjectId[];
-  answers: number;
   saved: Schema.Types.ObjectId[];
   reputation?: number;
 }
@@ -23,7 +21,7 @@ const userSchema = new Schema<IUser>({
     required: true,
     trim: true,
   },
-  userName: {
+  username: {
     type: String,
     required: true,
     unique: true, // Ensures unique usernames
@@ -38,11 +36,9 @@ const userSchema = new Schema<IUser>({
   password: { type: String },
   profilePhoto: {
     type: String,
-    required: true,
   },
   address: {
     type: String,
-    required: true,
   },
   portfolio: {
     type: String,
@@ -54,17 +50,6 @@ const userSchema = new Schema<IUser>({
   },
   bio: {
     type: String,
-    required: true,
-  },
-  questions: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Question",
-    },
-  ],
-  answers: {
-    type: Number,
-    default: 0,
   },
   reputation: {
     type: Number,
