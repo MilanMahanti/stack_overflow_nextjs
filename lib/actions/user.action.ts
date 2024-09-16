@@ -22,6 +22,17 @@ export async function getUser(params: GetUserByIdParams) {
     throw error;
   }
 }
+export async function getAllUser() {
+  try {
+    dbConnect();
+    const users = await User.find().sort({ createdAt: -1 });
+    return { users };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
 export async function createUser(userdata: CreateUserParams) {
   try {
     dbConnect();
