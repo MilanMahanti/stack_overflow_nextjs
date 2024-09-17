@@ -8,6 +8,7 @@ import React from "react";
 
 const page = async () => {
   const { users } = await getAllUser();
+  console.log(users);
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">All Users</h1>

@@ -55,6 +55,10 @@ const userSchema = new Schema<IUser>({
     type: Number,
     default: 0,
   },
+  clerkId: {
+    type: String,
+    required: true,
+  },
   saved: [
     {
       type: Schema.Types.ObjectId,
