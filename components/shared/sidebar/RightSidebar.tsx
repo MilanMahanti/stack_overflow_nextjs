@@ -5,7 +5,7 @@ import RenderTag from "../RenderTag";
 
 const RightSidebar = () => {
   return (
-    <section className="background-light900_dark200 custom-scrollbar light-border  sticky right-0 top-0 z-30 flex min-h-screen w-[350px] flex-col items-start overflow-y-auto p-6 pt-32  shadow-light-300 dark:shadow-none max-lg:hidden">
+    <section className="background-light900_dark200 custom-scrollbar light-border  sticky right-0 top-0 z-30 flex h-screen w-[350px] flex-col items-start overflow-y-auto p-6 pt-32  shadow-light-300 dark:shadow-none max-lg:hidden">
       <div className="mb-16 ">
         <h3 className="h3-bold text-dark200_light900 mb-6">Hot Network</h3>
         <div className="flex w-full flex-col gap-[30px]">
