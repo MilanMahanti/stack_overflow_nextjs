@@ -1,5 +1,7 @@
 import { SidebarLink } from "@/types";
 
+// NEXT_CLERK_WEBHOOK_SECRET=whsec_HH7u/ODBil8i9nIktjX6tjWhlmnQ9jmJ
+
 export const themes = [
   { value: "light", label: "Light", icon: "/assets/icons/sun.svg" },
   { value: "dark", label: "Dark", icon: "/assets/icons/moon.svg" },
