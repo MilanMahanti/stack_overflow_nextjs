@@ -7,7 +7,7 @@ import React from "react";
 const AskQuestion = async () => {
   const { userId } = auth();
   if (!userId) redirect("/sign-in");
-  const user = await getUser({ userId });
+  const { user } = await getUser({ userId });
   if (!user) redirect("/sign-in");
   return (
     <div>

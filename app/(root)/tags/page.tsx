@@ -3,7 +3,7 @@ import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { TagFilters } from "@/constants/filters";
-import { getAllTags } from "@/lib/actions/tags.actions";
+import { getAllTags } from "@/lib/actions/tags.action";
 import React from "react";
 
 const page = async () => {

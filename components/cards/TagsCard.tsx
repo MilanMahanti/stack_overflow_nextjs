@@ -12,7 +12,7 @@ interface props {
 const TagsCard = async ({ _id, name, followers, questions }: props) => {
   return (
     <Link
-      href={`/profile/`}
+      href={`/tag/${_id}`}
       className="shadow-md dark:shadow-none max-xs:min-w-full xs:w-[260px]"
     >
       <div className="background-light900_dark200 light-border flex flex-col items-start justify-between gap-6 rounded-xl border  px-8 py-10">

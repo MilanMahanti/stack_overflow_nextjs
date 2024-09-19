@@ -37,6 +37,14 @@ export const getTimeStamp = (createdAt: string | Date): string => {
   }
 };
 
+export function formatJoinDate(date: Date): string {
+  const options: Intl.DateTimeFormatOptions = {
+    month: "long",
+    year: "numeric",
+  };
+  const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
+  return `Joined ${formattedDate}`;
+}
 export const formatToK = (value: number): string => {
   if (value >= 1000) {
     return (value / 1000).toFixed(1).replace(/\.0$/, "") + "K";

@@ -11,7 +11,7 @@ import React from "react";
 const Page = async () => {
   const { userId } = auth();
   if (!userId) redirect("/sign-in");
-  const user = await getUser({ userId });
+  const { user } = await getUser({ userId });
   if (!user) redirect("/sign-in");
 
   const savedQuestions = await getSavedQuestion({ clerkId: userId });
@@ -21,7 +21,7 @@ const Page = async () => {
       <h1 className="h1-bold text-dark100_light900 mb-6">Saved Questions</h1>
       <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
         <LocalSearchBar
-          route="/"
+          route="/collection"
           iconPosition="left"
           imgSrc="/assets/icons/search.svg"
           extraClasses="flex-1"
@@ -50,12 +50,12 @@ const Page = async () => {
           ))
         ) : (
           <NoResult
-            title="There’s no question to show"
+            title="There’s no saved question to show"
             description="Be the first to break the silence! 🚀 Ask a Question and kickstart the
         discussion. our query could be the next big thing others learn from. Get
         involved! 💡"
-            link="/ask-question"
-            linkText="Ask a Question"
+            link="/"
+            linkText="Go back to Home"
           />
         )}
       </div>
