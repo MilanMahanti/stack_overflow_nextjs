@@ -100,11 +100,11 @@ const Home = async () => {
             <QuestionsCard
               key={question._id}
               _id={question._id}
-              answers={question.answers}
+              answers={question.answers.length}
               title={question.title}
               author={question.author}
               views={question.views}
-              upvotes={question.upvotes}
+              upvotes={question.upvotes.length}
               createdAt={question.createdAt}
               tags={question.tags}
             />

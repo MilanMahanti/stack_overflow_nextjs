@@ -15,9 +15,9 @@ interface props {
   upvotes: number;
   answers: number;
   author: {
-    _id: string;
+    clerkId: string;
     name: string;
-    image: string;
+    profilePhoto: string;
   };
   createdAt: Date;
 }
@@ -46,19 +46,19 @@ const QuestionsCard = async ({
         </div>
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2 ">
-        {tags.map(async (tag) => {
+        {tags.map((tag) => {
           return <RenderTag key={tag._id} _id={tag._id} name={tag.name} />;
         })}
       </div>
       <div className="flex-between mt-6 w-full flex-wrap gap-3">
         <Metric
-          imgUrl="/assets/icons/avatar.svg"
+          imgUrl={author.profilePhoto}
           alt={author.name}
           isAuthor
-          href={`/profile/${author._id}`}
+          href={`/profile/${author.clerkId}`}
           value={author.name}
           title={getTimeStamp(createdAt)}
-          textStyle="body-medium text-dark400_light700"
+          textStyle="body-medium text-dark400_light700 capitalize"
         />
         <Metric
           imgUrl="/assets/icons/like.svg"

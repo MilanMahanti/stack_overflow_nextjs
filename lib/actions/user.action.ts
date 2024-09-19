@@ -12,6 +12,7 @@ import {
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
+import Tag from "@/database/tag.model";
 
 export async function getUser(params: GetUserByIdParams) {
   try {
@@ -117,9 +118,18 @@ export async function getSavedQuestion(params: GetSavedQuestionsParams) {
   try {
     dbConnect();
     const { clerkId } = params;
-    const savedQuestion = await User.findById(clerkId)
-      .populate("saved")
-      .sort({ createdAt: -1 });
+    const savedQuestion = await User.findOne({ clerkId }).populate({
+      path: "saved",
+      options: {
+        sort: { createdAt: -1 },
+      },
+      populate: {
+        path: "tags",
+        model: Tag,
+        select: "_id name",
+      },
+    });
+
     return savedQuestion;
   } catch (error) {
     console.error(error);
