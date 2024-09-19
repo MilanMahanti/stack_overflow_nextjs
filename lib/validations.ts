@@ -8,3 +8,7 @@ export const QuestionFromSchema = z.object({
     .min(1)
     .max(5, "There should not be more than 5 tags."),
 });
+
+export const AnswerFromSchema = z.object({
+  answer: z.string().min(50),
+});

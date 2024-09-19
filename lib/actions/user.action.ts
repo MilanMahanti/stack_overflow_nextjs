@@ -5,7 +5,9 @@ import { dbConnect } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetSavedQuestionsParams,
   GetUserByIdParams,
+  ToggleSaveQuestionParams,
   UpdateUserParams,
 } from "./shared.types";
 import { revalidatePath } from "next/cache";
@@ -79,6 +81,46 @@ export async function deleteUser(params: DeleteUserParams) {
     // delete user
     const deletedUser = await User.findByIdAndDelete(user._id);
     return deletedUser;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
+  try {
+    dbConnect();
+    const { questionId, userId, path } = params;
+
+    const user = await User.findById(userId);
+    if (!user) throw new Error("User not found");
+
+    // Check if the question is already saved by the user
+    const hasSaved = user.saved.includes(questionId);
+    let updateQuery = {};
+    if (hasSaved) {
+      updateQuery = { $pull: { saved: questionId } };
+    } else {
+      updateQuery = { $addToSet: { saved: questionId } };
+    }
+    await User.findByIdAndUpdate(userId, updateQuery, { new: true });
+
+    revalidatePath(path);
+  } catch (error) {
+    // Log and throw the error for further handling
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function getSavedQuestion(params: GetSavedQuestionsParams) {
+  try {
+    dbConnect();
+    const { clerkId } = params;
+    const savedQuestion = await User.findById(clerkId)
+      .populate("saved")
+      .sort({ createdAt: -1 });
+    return savedQuestion;
   } catch (error) {
     console.error(error);
     throw error;

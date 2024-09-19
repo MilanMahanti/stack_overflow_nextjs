@@ -21,6 +21,9 @@ body {
   .btn {
     @apply bg-light-800 dark:bg-dark-300 !important;
   }
+  .btn:hover {
+    @apply bg-light-700 dark:bg-dark-400 transition ease-out delay-100 !important;
+  }
   .btn-secondary {
     @apply bg-light-800 dark:bg-dark-400 !important;
   }

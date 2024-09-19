@@ -22,6 +22,7 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { createQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "@/context/ThemeProvider";
 
 interface props {
   mongoUser: string;
@@ -29,6 +30,7 @@ interface props {
 
 const QuestionForm = ({ mongoUser }: props) => {
   const editorRef = useRef(null);
+  const { mode } = useTheme();
   const [isSubmmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const path = usePathname();
@@ -134,11 +136,7 @@ const QuestionForm = ({ mongoUser }: props) => {
                   onInit={(_evt, editor) => (editorRef.current = editor)}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => {
-                    const tempElement = document.createElement("div");
-                    tempElement.innerHTML = content;
-                    const textContent =
-                      tempElement.innerText || tempElement.textContent; // Extract text content
-                    field.onChange(textContent);
+                    field.onChange(content);
                   }}
                   init={{
                     height: 350,
@@ -167,6 +165,8 @@ const QuestionForm = ({ mongoUser }: props) => {
                       "alignright alignjustify | bullist numlist outdent indent | " +
                       "removeformat | help",
                     content_style: "body { font-family:Inter; font-size:16px }",
+                    skin: mode === "dark" ? "oxide-dark" : "oxide",
+                    content_css: mode === "dark" ? "dark" : "light",
                   }}
                 />
               </FormControl>
