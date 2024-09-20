@@ -20,28 +20,39 @@ import { QuestionFromSchema as formSchema } from "@/lib/validations";
 import React, { useRef, useState } from "react";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
-import { createQuestion } from "@/lib/actions/questions.action";
+import { createQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeProvider";
 
 interface props {
   mongoUser: string;
+  questionId?: string;
+  defaultValues?: string;
+  type?: string;
 }
 
-const QuestionForm = ({ mongoUser }: props) => {
+const QuestionForm = ({
+  mongoUser,
+  defaultValues,
+  questionId,
+  type = "create",
+}: props) => {
   const editorRef = useRef(null);
   const { mode } = useTheme();
   const [isSubmmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
   const path = usePathname();
 
+  const groupedTags =
+    defaultValues && JSON.parse(defaultValues).tags.map((tag: any) => tag.name);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
+      title: defaultValues ? JSON.parse(defaultValues).title : "",
       explanation: "",
-      tags: [],
+      tags: groupedTags || [],
     },
   });
 
@@ -49,16 +60,26 @@ const QuestionForm = ({ mongoUser }: props) => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    setIsSubmitting(true);
     try {
-      await createQuestion({
-        title: values.title,
-        explanation: values.explanation,
-        tags: values.tags,
-        author: JSON.parse(mongoUser),
-        path,
-      });
-      router.push("/");
+      setIsSubmitting(true);
+      if (type === "edit") {
+        await editQuestion({
+          questionId: JSON.parse(questionId!),
+          title: values.title,
+          explanation: values.explanation,
+          path,
+        });
+        router.push(`/question/${JSON.parse(questionId!)}`);
+      } else {
+        await createQuestion({
+          title: values.title,
+          explanation: values.explanation,
+          tags: values.tags,
+          author: JSON.parse(mongoUser),
+          path,
+        });
+        router.push("/");
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -168,6 +189,9 @@ const QuestionForm = ({ mongoUser }: props) => {
                     skin: mode === "dark" ? "oxide-dark" : "oxide",
                     content_css: mode === "dark" ? "dark" : "light",
                   }}
+                  initialValue={
+                    defaultValues ? JSON.parse(defaultValues).explanation : ""
+                  }
                 />
               </FormControl>
               <FormDescription className="body-regular text-light-500">
@@ -178,6 +202,7 @@ const QuestionForm = ({ mongoUser }: props) => {
             </FormItem>
           )}
         />
+
         <FormField
           control={form.control}
           name="tags"
@@ -191,6 +216,7 @@ const QuestionForm = ({ mongoUser }: props) => {
                   <Input
                     onKeyDown={(e) => handelAddTag(e, field)}
                     placeholder="Add tags"
+                    disabled={type === "edit"}
                     className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                   />
                   {field.value.length > 0 && (
@@ -201,14 +227,16 @@ const QuestionForm = ({ mongoUser }: props) => {
                           className="small-regular background-light800_dark300 text-light400_light500 flex items-center justify-center gap-2 rounded-md border-none px-4 py-2 capitalize"
                         >
                           {tag}
-                          <Image
-                            src="/assets/icons/close.svg"
-                            width={12}
-                            height={12}
-                            alt="close"
-                            className="cursor-pointer object-contain invert-0 dark:invert"
-                            onClick={() => handelRemoveTag(tag, field)}
-                          />
+                          {type === "create" && (
+                            <Image
+                              src="/assets/icons/close.svg"
+                              width={12}
+                              height={12}
+                              alt="close"
+                              className="cursor-pointer object-contain invert-0 dark:invert"
+                              onClick={() => handelRemoveTag(tag, field)}
+                            />
+                          )}
                         </Badge>
                       ))}
                     </div>
@@ -228,7 +256,11 @@ const QuestionForm = ({ mongoUser }: props) => {
           className="primary-gradient w-fit !text-light-900"
           disabled={isSubmmitting}
         >
-          {isSubmmitting ? "Submitting..." : "Submit"}
+          {isSubmmitting ? (
+            <>{type === "edit" ? "Updating..." : "Posting..."}</>
+          ) : (
+            <>{type === "edit" ? "Edit Question" : "Ask a question"}</>
+          )}
         </Button>
       </form>
     </Form>

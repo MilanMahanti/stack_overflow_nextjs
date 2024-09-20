@@ -6,8 +6,9 @@ export const dbConnect = async () => {
   mongoose.set("strictQuery", true);
   if (!process.env.MONGODB_URI)
     return console.error("Missing database connection URL");
+
   if (isConnected) {
-    return console.log("Database already connected!");
+    return;
   }
   try {
     mongoose

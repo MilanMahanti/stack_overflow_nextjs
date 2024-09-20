@@ -19,7 +19,7 @@ const ProfileLink = ({ imgUrl, alt, title, link }: params) => {
         className="object-contain"
       />
       <p
-        className={`paragraph-medium ${link ? "text-accent-blue" : "text-dark400_light700"}`}
+        className={`paragraph-medium ${link ? "text-accent-blue hover:underline" : "text-dark400_light700"}`}
       >
         {title}
       </p>

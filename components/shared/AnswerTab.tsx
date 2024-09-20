@@ -9,17 +9,18 @@ interface params {
 }
 const AnswerTab = async ({ searchParams, userId, clerkId }: params) => {
   const { answers } = await getUserAnswers({ userId });
-  console.log(answers);
   return (
     <>
       {answers.map((answer) => (
         <AnswerCard
           key={answer._id}
+          _id={answer._id}
           questionId={answer.question._id}
           title={answer.question.title}
           upvotes={answer.upvotes.length}
           author={answer.author}
           createdAt={answer.createdAt}
+          clerkId={clerkId}
         />
       ))}
     </>

@@ -3,9 +3,12 @@ import RenderTag from "../shared/RenderTag";
 import Link from "next/link";
 import Metric from "../shared/Metric";
 import { formatToK, getTimeStamp } from "@/lib/utils";
+import { SignedIn } from "@clerk/nextjs";
+import EditDeleteAction from "../shared/EditDeleteAction";
 
 interface props {
   _id: string;
+  clerkId?: string;
   title: string;
   tags: {
     _id: string;
@@ -30,7 +33,9 @@ const QuestionsCard = async ({
   answers,
   author,
   createdAt,
+  clerkId,
 }: props) => {
+  const showActionBtn = clerkId === author.clerkId;
   return (
     <div className="card-wrapper light-border w-full rounded-[10px] border px-9 py-8  dark:border-none sm:px-11">
       <div className="flex flex-col-reverse items-start justify-between gap-5 sm:flex-row">
@@ -44,6 +49,11 @@ const QuestionsCard = async ({
             </h3>
           </Link>
         </div>
+        <SignedIn>
+          {showActionBtn && (
+            <EditDeleteAction type="question" productId={JSON.stringify(_id)} />
+          )}
+        </SignedIn>
       </div>
       <div className="mt-3.5 flex flex-wrap gap-2 ">
         {tags.map((tag) => {

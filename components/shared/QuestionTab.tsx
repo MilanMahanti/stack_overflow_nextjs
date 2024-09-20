@@ -12,6 +12,7 @@ const QuestionTab = async ({ searchParams, userId, clerkId }: params) => {
     <>
       {questions.map((question) => (
         <QuestionsCard
+          clerkId={clerkId}
           key={question._id}
           _id={question._id}
           answers={question.answers.length}

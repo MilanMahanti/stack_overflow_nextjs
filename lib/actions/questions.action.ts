@@ -5,12 +5,16 @@ import { dbConnect } from "../mongoose";
 import { revalidatePath } from "next/cache";
 import {
   CreateQuestionParams,
+  DeleteQuestionParams,
+  EditQuestionParams,
   GetQuestionByIdParams,
   GetQuestionsParams,
   QuestionVoteParams,
 } from "./shared.types";
 import Tag from "@/database/tag.model";
 import User from "@/database/user.model";
+import Answer from "@/database/answer.model";
+import Interaction from "@/database/interaction.model";
 // import Answer from "@/database/answer.model";
 
 export async function createQuestion(params: CreateQuestionParams) {
@@ -42,6 +46,54 @@ export async function createQuestion(params: CreateQuestionParams) {
     await Question.findByIdAndUpdate(newQuestion._id, {
       $push: { tags: { $each: tagDocumentIds } },
     });
+    revalidatePath(path);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function editQuestion(params: EditQuestionParams) {
+  try {
+    dbConnect();
+    const { questionId, title, explanation, path } = params;
+    const prevQuestion = await Question.findById(questionId);
+    if (!prevQuestion) throw new Error("Question not found");
+    prevQuestion.title = title;
+    prevQuestion.explanation = explanation;
+    await prevQuestion.save();
+    revalidatePath(path);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+}
+
+export async function deleteQuestion(params: DeleteQuestionParams) {
+  try {
+    // Connect to the database
+    await dbConnect();
+
+    const { questionId, path } = params;
+
+    // Find the question by its ID
+    const question = await Question.findById(questionId);
+    if (!question) throw new Error("Question not found");
+
+    // Remove the question reference from all tags associated with the question
+    await Tag.updateMany(
+      { question: questionId },
+      { $pull: { questions: questionId } }
+    );
+
+    // Delete all associated answers
+    await Answer.deleteMany({ question: questionId });
+    // Delete all interaction
+    await Interaction.deleteMany({ question: questionId });
+    // Delete the question
+    await Question.findByIdAndDelete(questionId);
+
+    // Optionally revalidate the path (for cache invalidation)
     revalidatePath(path);
   } catch (error) {
     console.error(error);
@@ -115,6 +167,7 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
     throw error;
   }
 }
+
 export async function downvoteQuestion(params: QuestionVoteParams) {
   try {
     dbConnect();

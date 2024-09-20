@@ -30,7 +30,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
             alt={user?.name}
             width={140}
             height={140}
-            className="rounded-full border-2 border-primary-500 object-cover"
+            className="size-[140px] shrink-0 grow-0 rounded-full border-2 border-primary-500 object-cover"
           />
           <div className="mt-3">
             <h2 className="h2-bold text-dark100_light900 capitalize">
@@ -44,7 +44,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
                 <ProfileLink
                   imgUrl="/assets/icons/link.svg"
                   alt="link"
-                  title={user?.portfolio}
+                  title="Portfolio"
                   link={user?.portfolio}
                 />
               )}
@@ -62,19 +62,19 @@ const Page = async ({ params, searchParams }: URLProps) => {
                   title={formatJoinDate(user?.joiningDate)}
                 />
               )}
-              {user?.bio && (
-                <p className="paragraph-regular text-dark400_light800">
-                  {user?.bio}
-                </p>
-              )}
             </div>
+            {user?.bio && (
+              <p className="paragraph-regular text-dark400_light800">
+                {user?.bio}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex justify-end max-sm:mb-5 max-sm:w-full sm:mt-3">
           <SignedIn>
             {clerkId === user.clerkId && (
               <Link href={"/profile/edit"}>
-                <Button className="paragraph-medium btn-secondary light-border text-dark300_light900 min-h-[46px] min-w-[175px] border px-4 py-3 shadow-md dark:shadow-none">
+                <Button className="paragraph-medium btn-secondary light-border text-dark300_light900  border px-4 py-3 shadow-md dark:shadow-none">
                   Edit Profile
                 </Button>
               </Link>
