@@ -11,7 +11,7 @@ import Votes from "./Votes";
 interface params {
   questionId: string;
   totalAnswers: number;
-  userId: string;
+  userId?: string | undefined;
   page?: number;
   filter?: string;
 }
@@ -24,6 +24,7 @@ const AllAnswers = async ({
 }: params) => {
   const allAnswers = await getAllAnswers({
     questionId: JSON.parse(questionId),
+    sortBy: filter,
   });
   return (
     <div className="mt-11">
@@ -58,15 +59,19 @@ const AllAnswers = async ({
                   </div>
                 </Link>
                 <div className="flex justify-end">
-                  <Votes
-                    type="answer"
-                    upVotes={answer.upvotes.length}
-                    downVotes={answer.downvotes.length}
-                    userId={userId}
-                    productId={JSON.stringify(answer._id)}
-                    hasupVoted={answer.upvotes.includes(JSON.parse(userId))}
-                    hasdownVoted={answer.downvotes.includes(JSON.parse(userId))}
-                  />
+                  {userId && (
+                    <Votes
+                      type="answer"
+                      upVotes={answer.upvotes.length}
+                      downVotes={answer.downvotes.length}
+                      userId={userId}
+                      productId={JSON.stringify(answer._id)}
+                      hasupVoted={answer.upvotes.includes(JSON.parse(userId))}
+                      hasdownVoted={answer.downvotes.includes(
+                        JSON.parse(userId)
+                      )}
+                    />
+                  )}
                 </div>
               </div>
             </div>

@@ -25,14 +25,42 @@ export async function getTag(params: any) {
 export async function getAllTags(params: GetAllTagsParams) {
   try {
     dbConnect();
-    const tags = await Tag.find({}).sort({ createdAt: -1 });
+    const { searchQuery, filter } = params;
+    const query: FilterQuery<typeof Tag> = {};
+    if (searchQuery) {
+      query.$or = [
+        {
+          name: { $regex: new RegExp(searchQuery, "i") },
+        },
+      ];
+    }
+    let sortOptions = {};
+
+    switch (filter) {
+      case "popular":
+        sortOptions = { followers: -1 };
+        break;
+      case "recent":
+        sortOptions = { createdOn: -1 };
+        break;
+      case "name":
+        sortOptions = { name: 1 };
+        break;
+      case "old":
+        sortOptions = { createdOn: 1 };
+        break;
+      default:
+        break;
+    }
+
+    const tags = await Tag.find(query).sort(sortOptions);
     return { tags };
   } catch (error) {
     console.error(error);
     throw error;
   }
 }
-export async function getTopTags(params: GetTopInteractedTagsParams) {
+export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
     dbConnect();
     const { userId } = params;
@@ -49,7 +77,26 @@ export async function getTopTags(params: GetTopInteractedTagsParams) {
     throw error;
   }
 }
-
+export async function getTopTags() {
+  try {
+    dbConnect();
+    const topTags = await Tag.aggregate([
+      {
+        $project: { name: 1, numOfQuestions: { $size: "$questions" } },
+      },
+      {
+        $sort: { numOfQuestions: -1 },
+      },
+      {
+        $limit: 5,
+      },
+    ]);
+    return topTags;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
 export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
   try {
     dbConnect();

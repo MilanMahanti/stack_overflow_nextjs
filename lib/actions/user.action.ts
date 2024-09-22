@@ -5,6 +5,7 @@ import { dbConnect } from "../mongoose";
 import {
   CreateUserParams,
   DeleteUserParams,
+  GetAllUsersParams,
   GetSavedQuestionsParams,
   GetUserByIdParams,
   GetUserStatsParams,
@@ -15,6 +16,8 @@ import { revalidatePath } from "next/cache";
 import Question from "@/database/question.model";
 import Tag from "@/database/tag.model";
 import Answer from "@/database/answer.model";
+import { FilterQuery } from "mongoose";
+import { create } from "domain";
 
 export async function getUser(params: GetUserByIdParams) {
   try {
@@ -30,10 +33,33 @@ export async function getUser(params: GetUserByIdParams) {
     throw error;
   }
 }
-export async function getAllUser() {
+export async function getAllUser(params: GetAllUsersParams) {
   try {
     dbConnect();
-    const users = await User.find().sort({ createdAt: -1 });
+    const { searchQuery, filter } = params;
+    const query: FilterQuery<typeof User> = {};
+    if (searchQuery) {
+      query.$or = [
+        { name: { $regex: new RegExp(searchQuery, "i") } },
+        { username: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+    let sortOptions = {};
+    switch (filter) {
+      case "old_users":
+        sortOptions = { joiningDate: 1 };
+        break;
+      case "top_contributors":
+        sortOptions = { reputation: -1 };
+        break;
+      case "new_users":
+        sortOptions = { joiningDate: -1 };
+        break;
+
+      default:
+        break;
+    }
+    const users = await User.find(query).sort(sortOptions);
     return { users };
   } catch (error) {
     console.error(error);
@@ -122,11 +148,35 @@ export async function toggleSaveQuestion(params: ToggleSaveQuestionParams) {
 export async function getSavedQuestion(params: GetSavedQuestionsParams) {
   try {
     dbConnect();
-    const { clerkId } = params;
+    const { clerkId, searchQuery, filter } = params;
+    const query: FilterQuery<typeof Question> = searchQuery
+      ? { title: { $regex: new RegExp(searchQuery, "i") } }
+      : {};
+    let sortOptions = {};
+    switch (filter) {
+      case "most_recent":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "most_viewed":
+        sortOptions = { views: -1 };
+        break;
+      case "most_voted":
+        sortOptions = { upvotes: -1 };
+        break;
+      case "most_answered":
+        sortOptions = { answers: -1 };
+        break;
+      case "oldest":
+        sortOptions = { createdAt: 1 };
+        break;
+      default:
+        break;
+    }
     const savedQuestion = await User.findOne({ clerkId }).populate({
       path: "saved",
+      match: query,
       options: {
-        sort: { createdAt: -1 },
+        sort: sortOptions,
       },
       populate: {
         path: "tags",
@@ -145,7 +195,7 @@ export async function getSavedQuestion(params: GetSavedQuestionsParams) {
 export async function getUserQuestions(params: GetUserStatsParams) {
   try {
     dbConnect();
-    const { userId, page = 1, pageSize = 10 } = params;
+    const { userId } = params;
     const totalQuestions = await Question.countDocuments({ author: userId });
     const questions = await Question.find({ author: userId })
       .sort({
@@ -172,7 +222,7 @@ export async function getUserQuestions(params: GetUserStatsParams) {
 export async function getUserAnswers(params: GetUserStatsParams) {
   try {
     dbConnect();
-    const { userId, page = 1, pageSize = 10 } = params;
+    const { userId } = params;
     const totalAnswers = await Answer.countDocuments({ author: userId });
 
     const answers = await Answer.find({ author: userId })

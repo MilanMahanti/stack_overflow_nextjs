@@ -7,12 +7,13 @@ import Votes from "@/components/shared/Votes";
 import { getQuestionById } from "@/lib/actions/questions.action";
 import { getUser } from "@/lib/actions/user.action";
 import { formatToK, getTimeStamp } from "@/lib/utils";
+import { URLProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-const Page = async ({ params }: { params: { id: string } }) => {
+const Page = async ({ params, searchParams }: URLProps) => {
   const { question } = await getQuestionById({ questionId: params.id });
   const { userId: clerkId } = auth();
   let mongoUser;
@@ -40,18 +41,19 @@ const Page = async ({ params }: { params: { id: string } }) => {
               {question.author.name}
             </p>
           </Link>
-          {/* // todo: implement voting */}
           <div className="flex justify-end">
-            <Votes
-              upVotes={question.upvotes.length}
-              downVotes={question.downvotes.length}
-              userId={JSON.stringify(mongoUser?._id)}
-              type="question"
-              productId={JSON.stringify(question._id)}
-              hasupVoted={question.upvotes.includes(mongoUser?._id)}
-              hasdownVoted={question.downvotes.includes(mongoUser?._id)}
-              hasSaved={mongoUser?.saved.includes(question._id)}
-            />
+            {mongoUser && (
+              <Votes
+                upVotes={question.upvotes.length}
+                downVotes={question.downvotes.length}
+                userId={JSON.stringify(mongoUser?._id)}
+                type="question"
+                productId={JSON.stringify(question._id)}
+                hasupVoted={question.upvotes.includes(mongoUser?._id)}
+                hasdownVoted={question.downvotes.includes(mongoUser?._id)}
+                hasSaved={mongoUser?.saved.includes(question._id)}
+              />
+            )}
           </div>
         </div>
         <h2 className="h2-semibold text-dark200_light900 mt-3.5 w-full text-left">
@@ -89,12 +91,14 @@ const Page = async ({ params }: { params: { id: string } }) => {
       </div>
       <AllAnswers
         questionId={JSON.stringify(question._id)}
-        userId={JSON.stringify(mongoUser._id)}
+        userId={JSON.stringify(mongoUser?._id)}
         totalAnswers={question.answers.length}
+        filter={searchParams.filter}
       />
+
       <AnswerForm
-        authorId={JSON.stringify(mongoUser._id)}
-        questionId={JSON.stringify(question._id)}
+        authorId={JSON.stringify(mongoUser?._id)}
+        questionId={JSON.stringify(question?._id)}
       />
     </>
   );

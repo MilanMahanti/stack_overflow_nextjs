@@ -34,7 +34,6 @@ const EditProfileForm = ({ userDetails }: { userDetails: string }) => {
   const handelSubmit = async (values: z.infer<typeof ProfileFormSchema>) => {
     setIsSubmitting(true);
     try {
-      console.log(values);
       await updateUser({
         clerkId: parsedUserDetails.clerkId,
         updateData: values,

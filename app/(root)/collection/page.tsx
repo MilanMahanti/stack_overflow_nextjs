@@ -4,17 +4,22 @@ import NoResult from "@/components/shared/NoResult";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestion, getUser } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import React from "react";
 
-const Page = async () => {
+const Page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   if (!userId) redirect("/sign-in");
   const { user } = await getUser({ userId });
   if (!user) redirect("/sign-in");
 
-  const savedQuestions = await getSavedQuestion({ clerkId: userId });
+  const savedQuestions = await getSavedQuestion({
+    clerkId: userId,
+    searchQuery: searchParams?.q,
+    filter: searchParams.filter,
+  });
 
   return (
     <>
@@ -30,7 +35,6 @@ const Page = async () => {
         <Filter
           filters={QuestionFilters}
           extraClasses="min-h-[56px] sm:min-w-[170px]"
-          containerClasses="hidden max-md:flex"
         />
       </div>
       <div className="mt-10 flex flex-col gap-6">
@@ -51,9 +55,7 @@ const Page = async () => {
         ) : (
           <NoResult
             title="There’s no saved question to show"
-            description="Be the first to break the silence! 🚀 Ask a Question and kickstart the
-        discussion. our query could be the next big thing others learn from. Get
-        involved! 💡"
+            description="Save questions to get easier access to them later"
             link="/"
             linkText="Go back to Home"
           />

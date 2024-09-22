@@ -44,6 +44,7 @@ const AnswerForm = ({ authorId, questionId }: params) => {
     setIsSubmitting(true);
 
     try {
+      // todo: add validation to check signed in user
       await createAnswer({
         answer: values.answer,
         question: JSON.parse(questionId),

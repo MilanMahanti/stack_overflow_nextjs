@@ -1,47 +1,52 @@
 import Image from "next/image";
-import React from "react";
-import RenderTag from "../shared/RenderTag";
 import Link from "next/link";
-import { getTopTags } from "@/lib/actions/tags.action";
 import { Badge } from "../ui/badge";
+import RenderTag from "../shared/RenderTag";
+import { getTopInteractedTags } from "@/lib/actions/tags.action";
 
-interface props {
-  profilePhoto: string;
-  name: string;
-  userName: string;
-  _id: string;
-  clerkId: string;
+interface Props {
+  user: {
+    _id: string;
+    clerkId: string;
+    profilePhoto: string;
+    name: string;
+    username: string;
+  };
 }
-const UserCard = async ({
-  clerkId,
-  profilePhoto,
-  name,
-  userName,
-  _id,
-}: props) => {
-  const topTags = await getTopTags({ userId: _id });
+
+const UserCard = async ({ user }: Props) => {
+  const interactedTags = await getTopInteractedTags({ userId: user._id });
+
   return (
     <Link
-      href={`/profile/${clerkId}`}
-      className="shadow-md dark:shadow-none max-xs:min-w-full xs:w-[260px]"
+      href={`/profile/${user.clerkId}`}
+      className="w-full shadow-md dark:shadow-none max-xs:min-w-full xs:w-[260px]"
     >
-      <article className="background-light900_dark200 light-border flex flex-col items-center justify-between gap-6 rounded-xl border  p-8">
+      <article className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
         <Image
+          src={user.profilePhoto}
+          alt="user profile picture"
           width={100}
           height={100}
-          src={profilePhoto}
-          alt={name}
-          className="rounded-full object-contain"
+          className="rounded-full"
         />
-        <div className="flex flex-col gap-3 text-center">
-          <h3 className="h3-bold text-dark200_light900 line-clamp-1">{name}</h3>
-          <p className="body-regular text-dark500_light500">@ {userName}</p>
-        </div>
-        <div className="flex gap-3">
-          {/* //todo:change this as we implement the actual topTags  */}
 
-          {topTags.length > 0 ? (
-            topTags.map((tag, i) => <RenderTag key={i} _id={tag} name={tag} />)
+        <div className="mt-4 text-center">
+          <h3 className="h3-bold text-dark200_light900 line-clamp-1">
+            {user.name}
+          </h3>
+          <p className="body-regular text-dark500_light500 mt-2">
+            @{user.username}
+          </p>
+        </div>
+
+        <div className="mt-5">
+          {interactedTags.length > 0 ? (
+            <div className="flex items-center gap-2">
+              {interactedTags.map((tag: any) => (
+                <RenderTag key={tag} _id={tag} name={tag} />
+              ))}
+            </div>
           ) : (
             <Badge>No tags yet</Badge>
           )}

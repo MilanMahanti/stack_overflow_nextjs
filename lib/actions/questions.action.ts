@@ -15,6 +15,7 @@ import Tag from "@/database/tag.model";
 import User from "@/database/user.model";
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/interaction.model";
+import { FilterQuery } from "mongoose";
 // import Answer from "@/database/answer.model";
 
 export async function createQuestion(params: CreateQuestionParams) {
@@ -104,13 +105,35 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
 export async function getAllQuestions(params: GetQuestionsParams) {
   try {
     dbConnect();
-    const allQuestions = await Question.find()
+    const { searchQuery, filter } = params;
+    const query: FilterQuery<typeof Question> = {};
+    if (searchQuery) {
+      query.$or = [
+        { title: { $regex: new RegExp(searchQuery, "i") } },
+        { explanation: { $regex: new RegExp(searchQuery, "i") } },
+      ];
+    }
+    let sortOptions = {};
+    switch (filter) {
+      case "newest":
+        sortOptions = { createdAt: -1 };
+        break;
+      case "frequent":
+        sortOptions = { views: -1 };
+        break;
+      case "unanswered":
+        query.answers = { $size: 0 };
+        break;
+      default:
+        break;
+    }
+    const allQuestions = await Question.find(query)
       .populate({
         path: "tags",
         model: Tag,
       })
       .populate({ path: "author", model: User })
-      .sort({ createdAt: -1 });
+      .sort(sortOptions);
     return allQuestions;
   } catch (error) {
     console.log(error);
@@ -192,6 +215,19 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
     revalidatePath(path);
   } catch (error) {
     console.error(error);
+    throw error;
+  }
+}
+
+export async function getTopQuestions() {
+  try {
+    dbConnect();
+    const topQuestions = await Question.find()
+      .sort({ views: -1, upvotes: -1 })
+      .limit(5);
+    return topQuestions;
+  } catch (error) {
+    console.log(error);
     throw error;
   }
 }

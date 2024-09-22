@@ -28,7 +28,7 @@ const LeftSidebar = () => {
             <div key={item.route}>
               <Link
                 href={item.route}
-                className={`${isActive ? "primary-gradient rounded-[8px] text-light-900" : "text-dark300_light900"} flex items-center justify-start gap-5 bg-transparent p-4 `}
+                className={`${isActive ? "primary-gradient rounded-[8px] text-light-900" : "text-dark300_light900"} hover:background-light800_dark300 flex items-center justify-start gap-5 bg-transparent p-4 transition-all duration-300 ease-in-out`}
               >
                 <Image
                   src={item.imgURL}
@@ -50,7 +50,7 @@ const LeftSidebar = () => {
       <div className="mt-4 w-full">
         <SignedIn>
           <SignOutButton>
-            <Button className="text-dark400_light900  flex items-center justify-start gap-3 border-none bg-transparent hover:bg-transparent">
+            <Button className="text-dark400_light900  hover:background-light800_dark300 flex items-center justify-start gap-3 border-none bg-transparent ease-out">
               <Image
                 src="/assets/icons/tag.svg"
                 alt="logout"

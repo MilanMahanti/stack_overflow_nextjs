@@ -8,66 +8,13 @@ import { HomePageFilters } from "@/constants/filters";
 import Link from "next/link";
 import React from "react";
 import { getAllQuestions } from "@/lib/actions/questions.action";
+import { SearchParamsProps } from "@/types";
 
-// const questions = [
-//   {
-//     _id: "1",
-//     title: "How to center a div?",
-//     tags: [
-//       {
-//         _id: "1",
-//         value: "Python",
-//       },
-//       {
-//         _id: "2",
-//         value: "Css",
-//       },
-//       {
-//         _id: "3",
-//         value: "React",
-//       },
-//     ],
-//     author: {
-//       _id: "16",
-//       name: "John Doe",
-//       image: "/assets/icons/avatar.svg",
-//     },
-//     upvotes: 1298,
-//     views: 12883,
-//     answers: 30,
-//     createdAt: new Date(),
-//   },
-//   {
-//     _id: "2",
-//     title: "How to delete a table in SQL?",
-//     tags: [
-//       {
-//         _id: "1",
-//         value: "SQL",
-//       },
-//       {
-//         _id: "2",
-//         value: "Python",
-//       },
-//       {
-//         _id: "3",
-//         value: "Java",
-//       },
-//     ],
-//     author: {
-//       _id: "167",
-//       name: "John Doe",
-//       image: "/assets/icons/avatar.svg",
-//     },
-//     upvotes: 129,
-//     views: 1883,
-//     answers: 3,
-//     createdAt: new Date(),
-//   },
-// ];
-
-const Home = async () => {
-  const questions = await getAllQuestions({});
+const Home = async ({ searchParams }: SearchParamsProps) => {
+  const questions = await getAllQuestions({
+    searchQuery: searchParams.q,
+    filter: searchParams.filter,
+  });
 
   return (
     <>

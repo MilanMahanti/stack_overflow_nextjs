@@ -4,11 +4,15 @@ import NoResult from "@/components/shared/NoResult";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { UserFilters } from "@/constants/filters";
 import { getAllUser } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 import React from "react";
 
-const page = async () => {
-  const { users } = await getAllUser();
-  console.log(users);
+const page = async ({ searchParams }: SearchParamsProps) => {
+  const { users } = await getAllUser({
+    searchQuery: searchParams.q,
+    filter: searchParams.filter,
+  });
+
   return (
     <>
       <h1 className="h1-bold text-dark100_light900">All Users</h1>
@@ -28,16 +32,7 @@ const page = async () => {
       </div>
       <div className="mt-10 flex w-full flex-wrap gap-4">
         {users.length > 0 ? (
-          users.map((user) => (
-            <UserCard
-              key={user.id}
-              profilePhoto={user.profilePhoto}
-              name={user.name}
-              userName={user.username}
-              _id={user._id}
-              clerkId={user.clerkId}
-            />
-          ))
+          users.map((user) => <UserCard key={user.id} user={user} />)
         ) : (
           <NoResult
             title="There's no user to show"
