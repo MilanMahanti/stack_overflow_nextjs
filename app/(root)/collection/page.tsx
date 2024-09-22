@@ -1,6 +1,7 @@
 import QuestionsCard from "@/components/cards/QuestionsCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
+import Paginaion from "@/components/shared/Paginaion";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { QuestionFilters } from "@/constants/filters";
 import { getSavedQuestion, getUser } from "@/lib/actions/user.action";
@@ -15,10 +16,11 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
   const { user } = await getUser({ userId });
   if (!user) redirect("/sign-in");
 
-  const savedQuestions = await getSavedQuestion({
+  const { savedQuestions, isNext } = await getSavedQuestion({
     clerkId: userId,
     searchQuery: searchParams?.q,
     filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1,
   });
 
   return (
@@ -38,8 +40,8 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
         />
       </div>
       <div className="mt-10 flex flex-col gap-6">
-        {savedQuestions.saved.length > 0 ? (
-          savedQuestions.saved.map((question: any) => (
+        {savedQuestions?.length > 0 ? (
+          savedQuestions?.map((question: any) => (
             <QuestionsCard
               key={question._id}
               _id={question._id}
@@ -60,6 +62,12 @@ const Page = async ({ searchParams }: SearchParamsProps) => {
             linkText="Go back to Home"
           />
         )}
+      </div>
+      <div className="mt-10">
+        <Paginaion
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={isNext}
+        />
       </div>
     </>
   );

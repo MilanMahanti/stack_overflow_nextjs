@@ -25,7 +25,8 @@ export async function getTag(params: any) {
 export async function getAllTags(params: GetAllTagsParams) {
   try {
     dbConnect();
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+    const skipAmount = (page - 1) * pageSize;
     const query: FilterQuery<typeof Tag> = {};
     if (searchQuery) {
       query.$or = [
@@ -53,8 +54,13 @@ export async function getAllTags(params: GetAllTagsParams) {
         break;
     }
 
-    const tags = await Tag.find(query).sort(sortOptions);
-    return { tags };
+    const tags = await Tag.find(query)
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize);
+    const totalTags = await Tag.countDocuments(query);
+    const isNext = totalTags > skipAmount + pageSize;
+    return { tags, isNext };
   } catch (error) {
     console.error(error);
     throw error;
@@ -101,6 +107,7 @@ export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
   try {
     dbConnect();
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
+    const skipAmount = (page - 1) * pageSize;
     const tagFilter: FilterQuery<ITag> = { _id: tagId };
     const tag = await Tag.findOne(tagFilter).populate({
       path: "questions",
@@ -110,6 +117,8 @@ export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
         : {},
       options: {
         sort: { createdAt: -1 },
+        skip: skipAmount,
+        limit: pageSize + 1,
       },
       populate: [
         {
@@ -126,7 +135,8 @@ export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
     });
 
     if (!tag) throw new Error("No tag found");
-    return { tagName: tag.name, questions: tag.questions };
+    const isNext = tag.questions.length > pageSize;
+    return { tagName: tag.name, questions: tag.questions, isNext };
   } catch (error) {
     console.error(error);
     throw error;

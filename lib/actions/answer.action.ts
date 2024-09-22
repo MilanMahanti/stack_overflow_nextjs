@@ -66,7 +66,8 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
 export async function getAllAnswers(params: GetAnswersParams) {
   try {
     dbConnect();
-    const { questionId, sortBy } = params;
+    const { questionId, sortBy, page = 1, pageSize = 10 } = params;
+    const skipAmount = (page - 1) * pageSize;
     let sortOptions = {};
     switch (sortBy) {
       case "highestUpvotes":
@@ -91,8 +92,12 @@ export async function getAllAnswers(params: GetAnswersParams) {
         model: User,
         select: "_id clerkId name profilePhoto",
       })
-      .sort(sortOptions);
-    return { answers };
+      .sort(sortOptions)
+      .skip(skipAmount)
+      .limit(pageSize);
+    const totalAnswers = await Answer.countDocuments({ question: questionId });
+    const isNext = skipAmount + pageSize < totalAnswers;
+    return { answers, isNext };
   } catch (error) {
     console.error(error);
     throw error;

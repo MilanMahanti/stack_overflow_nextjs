@@ -7,6 +7,7 @@ import Image from "next/image";
 import { getTimeStamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
+import Paginaion from "./Paginaion";
 
 interface params {
   questionId: string;
@@ -22,9 +23,10 @@ const AllAnswers = async ({
   page,
   filter,
 }: params) => {
-  const allAnswers = await getAllAnswers({
+  const { answers, isNext } = await getAllAnswers({
     questionId: JSON.parse(questionId),
     sortBy: filter,
+    page,
   });
   return (
     <div className="mt-11">
@@ -33,7 +35,7 @@ const AllAnswers = async ({
         <Filter filters={AnswerFilters} />
       </div>
       <div>
-        {allAnswers.answers.map((answer: any) => (
+        {answers?.map((answer: any) => (
           <article key={answer._id} className="light-border border-b py-10">
             <div className="flex  items-center justify-between">
               <div className="mb-8 flex flex-col-reverse justify-between sm:flex-row sm:items-center sm:gap-2">
@@ -78,6 +80,9 @@ const AllAnswers = async ({
             <ParseHTML data={answer.answer} />
           </article>
         ))}
+      </div>
+      <div className="mt-10">
+        <Paginaion pageNumber={page!} isNext={isNext} />
       </div>
     </div>
   );
