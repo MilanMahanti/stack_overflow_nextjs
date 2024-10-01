@@ -17,7 +17,10 @@ const GlobalSearch = () => {
   const modalRef = useRef(null);
   useEffect(() => {
     const handelOutsideClick = (event: any) => {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
+      if (
+        modalRef.current &&
+        !(modalRef.current as HTMLElement).contains(event.target)
+      ) {
         setModelIsOpen(false);
         setSearch("");
       }
