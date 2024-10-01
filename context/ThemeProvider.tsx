@@ -27,9 +27,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  // Apply theme change when `mode` is updated
   useEffect(() => {
     handelThemeChange();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode]);
 
   return (

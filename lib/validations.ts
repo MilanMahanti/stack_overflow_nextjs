@@ -2,15 +2,17 @@ import { z } from "zod";
 
 export const QuestionFromSchema = z.object({
   title: z.string().min(5).max(130),
-  explanation: z.string().min(50),
+  explanation: z
+    .string()
+    .min(20, "Question explanation should be at least 20 characters long."),
   tags: z
     .array(z.string().min(1).max(15))
-    .min(1)
+    .min(1, "There should at least be one tag.")
     .max(5, "There should not be more than 5 tags."),
 });
 
 export const AnswerFromSchema = z.object({
-  answer: z.string().min(50),
+  answer: z.string().min(20),
 });
 
 export const ProfileFormSchema = z.object({

@@ -5,6 +5,7 @@ import { deleteQuestion } from "@/lib/actions/questions.action";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import toast from "react-hot-toast";
 interface props {
   type: string;
   productId: string;
@@ -18,10 +19,28 @@ const EditDeleteAction = ({ type, productId }: props) => {
   const handelDelete = async () => {
     if (type === "question") {
       // delete question
-      await deleteQuestion({ questionId: JSON.parse(productId), path });
+      const toastId = toast.loading("Deleting question...");
+      try {
+        await deleteQuestion({ questionId: JSON.parse(productId), path });
+        toast.dismiss(toastId);
+        toast.success("Question deleted successfully");
+      } catch (error) {
+        toast.dismiss(toastId);
+
+        toast.error("There was some problem deleteing the question");
+      }
     } else if (type === "answer") {
       // delete answer
-      await deleteAnswer({ answerId: JSON.parse(productId), path });
+      const toastId = toast.loading("Deleting answer...");
+      try {
+        await deleteAnswer({ answerId: JSON.parse(productId), path });
+        toast.dismiss(toastId);
+        toast.success("Answer deleted successfully");
+      } catch (error) {
+        toast.dismiss(toastId);
+
+        toast.error("There was some problem deleting the answer");
+      }
     }
   };
   return (

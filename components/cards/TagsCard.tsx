@@ -8,26 +8,30 @@ interface props {
   name: string;
   followers: [];
   questions: [];
+  description: string;
 }
-const TagsCard = async ({ _id, name, followers, questions }: props) => {
+const TagsCard = async ({
+  _id,
+  name,
+  followers,
+  questions,
+  description,
+}: props) => {
   return (
     <Link
       href={`/tag/${_id}`}
-      className="shadow-md dark:shadow-none max-xs:min-w-full xs:w-[260px]"
+      className="light-border background-light900_dark200 flex flex-col items-start justify-between gap-6 rounded-xl  border px-8 py-10 shadow-[0_3px_10px_rgb(0,0,0,0.2)] hover:scale-105  dark:border-none  dark:shadow-none max-xs:min-w-full xs:w-[260px]"
     >
-      <div className="background-light900_dark200 light-border flex flex-col items-start justify-between gap-6 rounded-xl border  px-8 py-10">
-        <Badge className="paragraph-semibold background-light800_dark300 text-dark300_light900 rounded-md border-none px-5 py-1.5 ">
-          {name}
-        </Badge>
-        <p className="small-regular text-dark500_light700">
-          JavaScript, often abbreviated as JS, is a programming language that is
-          one of the core technologies of the World Wide Web, alongside HTML and
-          CSS
-        </p>
-        <div className="body-semibold flex gap-3">
-          <p className="primary-text-gradient">{questions.length}+</p>
-          <p className="text-dark500_light700">Questions</p>
-        </div>
+      <Badge className="paragraph-semibold background-light800_dark300 text-dark300_light900 rounded-md border-none px-5 py-1.5 ">
+        {name}
+      </Badge>
+
+      <p className="small-regular text-dark500_light700 ">
+        {description.slice(0, 200)}...
+      </p>
+      <div className="body-semibold flex gap-3">
+        <p className="primary-text-gradient">{questions.length}+</p>
+        <p className="text-dark500_light700">Questions</p>
       </div>
     </Link>
   );

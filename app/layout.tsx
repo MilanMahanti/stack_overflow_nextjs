@@ -24,6 +24,32 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/site-logo.svg",
   },
+  openGraph: {
+    title: "DevFlow",
+    description:
+      "A developer-focused web app for asking and answering coding questions. Built on Next.js with real-time features and robust search functionality.",
+    url: "https://stack-overflow-nextjs-beige.vercel.app/",
+    images: [
+      {
+        url: "/assets/images/optimized-logo.jpg",
+        width: 1200,
+        height: 630,
+        alt: "DevFlow Logo",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    site: "@DevFlow",
+    title: "DevFlow",
+    description:
+      "A developer-focused web app for asking and answering coding questions. Built on Next.js with real-time features and robust search functionality.",
+    images: [
+      {
+        url: "/assets/images/optimized-logo.jpg",
+      },
+    ],
+  },
 };
 
 export default function RootLayout({

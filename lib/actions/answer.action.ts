@@ -15,17 +15,33 @@ import Interaction from "@/database/interaction.model";
 
 export async function createAnswer(params: CreateAnswerParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { question, author, answer, path } = params;
     const newAnswer = await Answer.create({
       question,
       author,
       answer,
     });
-    await Question.findByIdAndUpdate(question, {
-      $push: { answers: newAnswer._id },
+    const newQuestion = await Question.findByIdAndUpdate(
+      question,
+      {
+        $push: { answers: newAnswer._id },
+      },
+      { new: true }
+    );
+
+    await Interaction.create({
+      user: author,
+      action: "answer",
+      question: newQuestion._id,
+      answer: newAnswer._id,
+      tags: newQuestion.tags,
     });
-    // todo: add interactions
+
+    await User.findByIdAndUpdate(author, {
+      $inc: { reputation: 10 },
+    });
+
     revalidatePath(path);
   } catch (error) {
     console.error(error);
@@ -35,7 +51,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 
 export async function deleteAnswer(params: DeleteAnswerParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { answerId, path } = params;
 
     // Find the answer to delete
@@ -65,7 +81,7 @@ export async function deleteAnswer(params: DeleteAnswerParams) {
 
 export async function getAllAnswers(params: GetAnswersParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { questionId, sortBy, page = 1, pageSize = 10 } = params;
     const skipAmount = (page - 1) * pageSize;
     let sortOptions = {};
@@ -105,7 +121,7 @@ export async function getAllAnswers(params: GetAnswersParams) {
 }
 export async function upvoteAnswer(params: AnswerVoteParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
     let updateQuery = {};
     if (hasupVoted) {
@@ -124,6 +140,15 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
       new: true,
     });
     if (!answer) throw new Error("Answer not found");
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -2 : 2 },
+    });
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -5 : 5 },
+    });
+
     revalidatePath(path);
   } catch (error) {
     console.error(error);
@@ -132,7 +157,7 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
 }
 export async function downvoteAnswer(params: AnswerVoteParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
     let updateQuery = {};
     if (hasdownVoted) {
@@ -151,6 +176,14 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
       new: true,
     });
     if (!answer) throw new Error("Answer not found");
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasdownVoted ? -2 : 2 },
+    });
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasdownVoted ? -5 : 5 },
+    });
     revalidatePath(path);
   } catch (error) {
     console.error(error);

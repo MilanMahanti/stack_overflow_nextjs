@@ -17,6 +17,8 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { updateUser } from "@/lib/actions/user.action";
 import { useRouter } from "next/navigation";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import toast from "react-hot-toast";
 const EditProfileForm = ({ userDetails }: { userDetails: string }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
@@ -33,6 +35,7 @@ const EditProfileForm = ({ userDetails }: { userDetails: string }) => {
   });
   const handelSubmit = async (values: z.infer<typeof ProfileFormSchema>) => {
     setIsSubmitting(true);
+    const toastId = toast.loading("Updating your profile...");
     try {
       await updateUser({
         clerkId: parsedUserDetails.clerkId,
@@ -40,8 +43,11 @@ const EditProfileForm = ({ userDetails }: { userDetails: string }) => {
         path: `/profile/${parsedUserDetails.clerkId}`,
       });
       router.push(`/profile/${parsedUserDetails.clerkId}`);
+      toast.dismiss(toastId);
+      toast.success("Profile updated successfully");
     } catch (error) {
-      console.log(error);
+      toast.dismiss(toastId);
+      toast.error("Failed to update profile");
     } finally {
       setIsSubmitting(false);
     }
@@ -144,6 +150,9 @@ const EditProfileForm = ({ userDetails }: { userDetails: string }) => {
           className="primary-gradient w-fit !text-light-900"
           disabled={isSubmitting}
         >
+          {isSubmitting && (
+            <ReloadIcon className="mr-2 size-4 animate-spin text-light-900" />
+          )}
           {isSubmitting ? "Updating..." : "Update profile"}
         </Button>
       </form>

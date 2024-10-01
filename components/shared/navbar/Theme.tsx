@@ -40,7 +40,7 @@ const Theme = () => {
           {themes.map((theme) => (
             <MenubarItem
               key={theme.label}
-              className="flex items-center gap-4 px-2.5 py-2 focus:bg-light-700 dark:focus:bg-dark-400"
+              className="flex cursor-pointer items-center gap-4 px-2.5 py-2 focus:bg-light-700 dark:focus:bg-dark-400"
               onClick={() => {
                 setMode(theme.value);
                 if (theme.value !== "system") {

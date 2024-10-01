@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { sidebarLinks } from "@/constants";
 import { SignedIn, SignedOut, SignOutButton, useAuth } from "@clerk/nextjs";
+import { ExitIcon } from "@radix-ui/react-icons";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,14 +29,14 @@ const LeftSidebar = () => {
             <div key={item.route}>
               <Link
                 href={item.route}
-                className={`${isActive ? "primary-gradient rounded-[8px] text-light-900" : "text-dark300_light900"} hover:background-light800_dark300 flex items-center justify-start gap-5 bg-transparent p-4 transition-all duration-300 ease-in-out`}
+                className={`${isActive ? "primary-gradient  rounded-[8px] text-light-900" : "text-dark300_light900"} hover:background-light800_dark300 group flex items-center justify-start gap-5 bg-transparent p-4 transition-all ease-linear`}
               >
                 <Image
                   src={item.imgURL}
                   alt={item.label}
                   width={20}
                   height={20}
-                  className={`${isActive ? "" : "invert-colors"}`}
+                  className={`${isActive ? "" : "invert-colors"} group-hover:scale-125`}
                 />
                 <p
                   className={`${isActive ? "base-bold" : "base-medium"} max-lg:hidden`}
@@ -50,15 +51,13 @@ const LeftSidebar = () => {
       <div className="mt-4 w-full">
         <SignedIn>
           <SignOutButton>
-            <Button className="text-dark400_light900  hover:background-light800_dark300 flex items-center justify-start gap-3 border-none bg-transparent ease-out">
-              <Image
-                src="/assets/icons/tag.svg"
-                alt="logout"
+            <Button className="text-dark400_light900 hover:background-light800_dark300  group flex items-center justify-start gap-3 border-none bg-transparent ease-out">
+              <ExitIcon
                 width={20}
                 height={20}
-                className="invert-colors"
+                className="  group-hover:scale-125"
               />
-              <span className="max-lg:hidden"> Logout </span>
+              <span className="base-medium max-lg:hidden"> Logout </span>
             </Button>
           </SignOutButton>
         </SignedIn>
@@ -79,7 +78,7 @@ const LeftSidebar = () => {
               </Button>
             </Link>
             <Link href="/sign-up">
-              <Button className="small-medium light-border-2 text-dark400_light800 min-h-[42px] w-full rounded-lg bg-light-700 px-4 py-3 shadow-none  dark:bg-dark-300">
+              <Button className="small-medium light-border-2 text-dark400_light800 min-h-[42px] w-full rounded-lg bg-light-700 px-4 py-3 shadow-none  hover:bg-light-500/80 dark:bg-dark-300 hover:dark:bg-dark-400">
                 <span className="max-lg:hidden">Sign up</span>
                 <Image
                   src="/assets/icons/sign-up.svg"

@@ -16,11 +16,11 @@ import User from "@/database/user.model";
 import Answer from "@/database/answer.model";
 import Interaction from "@/database/interaction.model";
 import { FilterQuery } from "mongoose";
-// import Answer from "@/database/answer.model";
+import { escapeRegExp, fetchWikipediaDescription } from "../utils";
 
 export async function createQuestion(params: CreateQuestionParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { title, explanation, author, tags, path } = params;
     const newQuestion = await Question.create({
       title,
@@ -28,13 +28,29 @@ export async function createQuestion(params: CreateQuestionParams) {
       author,
     });
     const tagDocumentIds = [];
+
     for (const tag of tags) {
+      // Check if the tag already exists
+      const existingTag = await Tag.findOne({
+        name: { $regex: new RegExp(`^${escapeRegExp(tag)}$`, "i") },
+      });
+
+      let tagDescription;
+
+      // Fetch the description only if the tag does not exist
+      if (!existingTag) {
+        tagDescription = await fetchWikipediaDescription(tag);
+      } else {
+        tagDescription = existingTag.description;
+      }
+
+      // Update or insert the tag document
       const tagDocument = await Tag.findOneAndUpdate(
         {
-          name: { $regex: new RegExp(`^${tag}$`, "i") },
+          name: { $regex: new RegExp(`^${escapeRegExp(tag)}$`, "i") },
         },
         {
-          $setOnInsert: { name: tag },
+          $setOnInsert: { name: tag, description: tagDescription },
           $addToSet: { questions: newQuestion._id },
         },
         {
@@ -42,11 +58,22 @@ export async function createQuestion(params: CreateQuestionParams) {
           new: true,
         }
       );
+
       tagDocumentIds.push(tagDocument._id);
     }
+
     await Question.findByIdAndUpdate(newQuestion._id, {
       $push: { tags: { $each: tagDocumentIds } },
     });
+
+    await Interaction.create({
+      user: author,
+      action: "ask_question",
+      question: newQuestion._id,
+      tags: tagDocumentIds,
+    });
+
+    await User.findByIdAndUpdate(author, { $inc: { reputation: 5 } });
     revalidatePath(path);
   } catch (error) {
     console.error(error);
@@ -56,7 +83,7 @@ export async function createQuestion(params: CreateQuestionParams) {
 
 export async function editQuestion(params: EditQuestionParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { questionId, title, explanation, path } = params;
     const prevQuestion = await Question.findById(questionId);
     if (!prevQuestion) throw new Error("Question not found");
@@ -104,8 +131,8 @@ export async function deleteQuestion(params: DeleteQuestionParams) {
 
 export async function getAllQuestions(params: GetQuestionsParams) {
   try {
-    dbConnect();
-    const { searchQuery, filter, page = 1, pageSize = 10 } = params;
+    await dbConnect();
+    const { searchQuery, filter, page = 1, pageSize = 20 } = params;
     const skipAmount = (page - 1) * pageSize;
     const query: FilterQuery<typeof Question> = {};
     if (searchQuery) {
@@ -149,7 +176,7 @@ export async function getAllQuestions(params: GetQuestionsParams) {
 
 export async function getQuestionById(params: GetQuestionByIdParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const question = await Question.findById(params.questionId)
       .populate({
         path: "tags",
@@ -171,7 +198,7 @@ export async function getQuestionById(params: GetQuestionByIdParams) {
 
 export async function upvoteQuestion(params: QuestionVoteParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
     let updateQuery = {};
     if (hasupVoted) {
@@ -190,6 +217,12 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
       new: true,
     });
     if (!question) throw new Error("Question not found");
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -1 : 1 },
+    });
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
     revalidatePath(path);
   } catch (error) {
     console.error(error);
@@ -199,7 +232,7 @@ export async function upvoteQuestion(params: QuestionVoteParams) {
 
 export async function downvoteQuestion(params: QuestionVoteParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { questionId, userId, hasupVoted, hasdownVoted, path } = params;
     let updateQuery = {};
     if (hasdownVoted) {
@@ -218,6 +251,13 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
       new: true,
     });
     if (!question) throw new Error("Question not found");
+
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasdownVoted ? -2 : 2 },
+    });
+    await User.findByIdAndUpdate(question.author, {
+      $inc: { reputation: hasdownVoted ? -10 : 10 },
+    });
     revalidatePath(path);
   } catch (error) {
     console.error(error);
@@ -227,7 +267,7 @@ export async function downvoteQuestion(params: QuestionVoteParams) {
 
 export async function getTopQuestions() {
   try {
-    dbConnect();
+    await dbConnect();
     const topQuestions = await Question.find()
       .sort({ views: -1, upvotes: -1 })
       .limit(5);

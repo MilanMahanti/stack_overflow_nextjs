@@ -8,6 +8,12 @@ const nextConfig = {
         port: "",
         pathname: "/**",
       },
+      {
+        protocol: "https",
+        hostname: "findwork-dev-images.s3.amazonaws.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };

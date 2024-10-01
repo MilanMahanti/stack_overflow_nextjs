@@ -34,3 +34,10 @@ export const GlobalSearchFilters = [
   { name: "User", value: "user" },
   { name: "Tag", value: "tag" },
 ];
+
+export const JobFilters = [
+  { name: "Full Time", value: "full+time" },
+  { name: "Part Time", value: "part+time" },
+  { name: "Remote", value: "remote" },
+  { name: "Newest", value: "newest" },
+];

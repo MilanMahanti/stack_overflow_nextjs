@@ -1,7 +1,7 @@
 import { getUserQuestions } from "@/lib/actions/user.action";
 import React from "react";
 import QuestionsCard from "../cards/QuestionsCard";
-import Paginaion from "./Paginaion";
+import Pagination from "./Pagination";
 interface params {
   searchParams: any;
   userId: string;
@@ -33,7 +33,7 @@ const QuestionTab = async ({ searchParams, userId, clerkId }: params) => {
         <p className="body-medium  text-dark500_light700 ">No question found</p>
       )}
       <div className="mt-10">
-        <Paginaion
+        <Pagination
           pageNumber={searchParams.page ? +searchParams.page : 1}
           isNext={isNextQuestion}
         />

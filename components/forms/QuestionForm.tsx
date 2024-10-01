@@ -23,6 +23,8 @@ import Image from "next/image";
 import { createQuestion, editQuestion } from "@/lib/actions/questions.action";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "@/context/ThemeProvider";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import toast from "react-hot-toast";
 
 interface props {
   mongoUser: string;
@@ -60,6 +62,7 @@ const QuestionForm = ({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
+    const toastId = toast.loading("Posting your question...");
     try {
       setIsSubmitting(true);
       if (type === "edit") {
@@ -70,6 +73,8 @@ const QuestionForm = ({
           path,
         });
         router.push(`/question/${JSON.parse(questionId!)}`);
+        toast.dismiss(toastId);
+        toast.success("Question updated successfully");
       } else {
         await createQuestion({
           title: values.title,
@@ -79,9 +84,12 @@ const QuestionForm = ({
           path,
         });
         router.push("/");
+        toast.dismiss(toastId);
+        toast.success("Question created successfully");
       }
     } catch (error) {
-      console.log(error);
+      toast.dismiss(toastId);
+      toast.error("Something went wrong please try again later");
     } finally {
       setIsSubmitting(false);
     }
@@ -256,6 +264,9 @@ const QuestionForm = ({
           className="primary-gradient w-fit !text-light-900"
           disabled={isSubmmitting}
         >
+          {isSubmmitting && (
+            <ReloadIcon className="mr-2 size-4 animate-spin text-light-900" />
+          )}
           {isSubmmitting ? (
             <>{type === "edit" ? "Updating..." : "Posting..."}</>
           ) : (

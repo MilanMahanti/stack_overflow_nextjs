@@ -12,12 +12,27 @@ import ProfileLink from "@/components/shared/ProfileLink";
 import Stats from "@/components/shared/Stats";
 import QuestionTab from "@/components/shared/QuestionTab";
 import AnswerTab from "@/components/shared/AnswerTab";
+import { Metadata } from "next";
 interface URLProps {
   params: { id: string };
   searchParams: any;
 }
+
+export async function generateMetadata({
+  params,
+}: URLProps): Promise<Metadata> {
+  const { user } = await getUser({
+    userId: params.id,
+  });
+
+  return {
+    title: `DevFlow | ${user.name}'s Profile`,
+    description: `View ${user.name}'s profile on DevFlow. Explore their contributions, questions, and answers in the developer community.`,
+  };
+}
+
 const Page = async ({ params, searchParams }: URLProps) => {
-  const { user, totalAnswers, totalQuestions } = await getUser({
+  const { user, totalAnswers, totalQuestions, badgeCounts } = await getUser({
     userId: params.id,
   });
   const { userId: clerkId } = auth();
@@ -82,7 +97,11 @@ const Page = async ({ params, searchParams }: URLProps) => {
           </SignedIn>
         </div>
       </div>
-      <Stats totalAnswers={totalAnswers} totalQuestions={totalQuestions} />
+      <Stats
+        totalAnswers={totalAnswers}
+        totalQuestions={totalQuestions}
+        badgeCounts={badgeCounts}
+      />
       <div className="mt-10">
         <Tabs defaultValue="top-posts">
           <TabsList className="background-light800_dark400 min-h-[42px] p-1">
@@ -93,14 +112,14 @@ const Page = async ({ params, searchParams }: URLProps) => {
               Answers
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="top-posts" className="flex flex-col gap-4">
+          <TabsContent value="top-posts" className="mt-4 flex flex-col gap-6">
             <QuestionTab
               searchParams={searchParams}
               clerkId={clerkId!}
               userId={user._id}
             />
           </TabsContent>
-          <TabsContent value="answers" className="flex flex-col gap-4">
+          <TabsContent value="answers" className="mt-4 flex flex-col gap-6">
             <AnswerTab
               searchParams={searchParams}
               clerkId={clerkId!}

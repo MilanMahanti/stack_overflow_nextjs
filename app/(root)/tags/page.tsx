@@ -1,12 +1,19 @@
 import TagsCard from "@/components/cards/TagsCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
-import Paginaion from "@/components/shared/Paginaion";
+import Pagination from "@/components/shared/Pagination";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { TagFilters } from "@/constants/filters";
 import { getAllTags } from "@/lib/actions/tags.action";
 import { SearchParamsProps } from "@/types";
+import { Metadata } from "next";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "DevFlow | Tags",
+  description:
+    "Browse and explore topics by tags on DevFlow. Find questions and discussions related to specific programming languages, frameworks, and tools.",
+};
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const { tags, isNext } = await getAllTags({
@@ -41,6 +48,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
               followers={tag.followers}
               name={tag.name}
               questions={tag.questions}
+              description={tag.description}
             />
           ))
         ) : (
@@ -53,7 +61,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         )}
       </div>
       <div className="mt-10">
-        <Paginaion
+        <Pagination
           pageNumber={searchParams?.page ? +searchParams.page : 1}
           isNext={isNext}
         />

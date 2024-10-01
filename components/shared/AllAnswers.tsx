@@ -7,7 +7,7 @@ import Image from "next/image";
 import { getTimeStamp } from "@/lib/utils";
 import ParseHTML from "./ParseHTML";
 import Votes from "./Votes";
-import Paginaion from "./Paginaion";
+import Pagination from "./Pagination";
 
 interface params {
   questionId: string;
@@ -15,8 +15,10 @@ interface params {
   userId?: string | undefined;
   page?: number;
   filter?: string;
+  mongoUser?: string | undefined;
 }
 const AllAnswers = async ({
+  mongoUser,
   questionId,
   totalAnswers,
   userId,
@@ -28,6 +30,8 @@ const AllAnswers = async ({
     sortBy: filter,
     page,
   });
+  const user = mongoUser && JSON.parse(mongoUser);
+
   return (
     <div className="mt-11">
       <div className="flex items-center justify-between">
@@ -35,10 +39,14 @@ const AllAnswers = async ({
         <Filter filters={AnswerFilters} />
       </div>
       <div>
-        {answers?.map((answer: any) => (
-          <article key={answer._id} className="light-border border-b py-10">
-            <div className="flex  items-center justify-between">
-              <div className="mb-8 flex flex-col-reverse justify-between sm:flex-row sm:items-center sm:gap-2">
+        {answers?.map((answer: any) => {
+          return (
+            <article
+              key={answer._id}
+              id={answer._id}
+              className="light-border border-b py-10"
+            >
+              <div className="mb-8 flex  flex-col-reverse justify-between sm:flex-row sm:items-center sm:gap-2">
                 <Link
                   href={`/profile/${answer.author.clerkId}`}
                   className="flex flex-1 items-start gap-1 sm:items-center"
@@ -61,7 +69,7 @@ const AllAnswers = async ({
                   </div>
                 </Link>
                 <div className="flex justify-end">
-                  {userId && (
+                  {user && userId && (
                     <Votes
                       type="answer"
                       upVotes={answer.upvotes.length}
@@ -72,17 +80,20 @@ const AllAnswers = async ({
                       hasdownVoted={answer.downvotes.includes(
                         JSON.parse(userId)
                       )}
+                      hasSaved={user?.savedAnswers.includes(
+                        answer._id.toString()
+                      )}
                     />
                   )}
                 </div>
               </div>
-            </div>
-            <ParseHTML data={answer.answer} />
-          </article>
-        ))}
+              <ParseHTML data={answer.answer} />
+            </article>
+          );
+        })}
       </div>
       <div className="mt-10">
-        <Paginaion pageNumber={page!} isNext={isNext} />
+        <Pagination pageNumber={page!} isNext={isNext} />
       </div>
     </div>
   );

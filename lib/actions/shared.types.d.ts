@@ -116,7 +116,19 @@ export interface ToggleSaveQuestionParams {
   questionId: string;
   path: string;
 }
+export interface ToggleSaveAnswerParams {
+  userId: string;
+  answerId: string;
+  path: string;
+}
 export interface GetSavedQuestionsParams {
+  clerkId: string;
+  page?: number;
+  pageSize?: number;
+  filter?: string;
+  searchQuery?: string;
+}
+export interface GetSavedAnswersParams {
   clerkId: string;
   page?: number;
   pageSize?: number;
@@ -130,4 +142,11 @@ export interface GetUserStatsParams {
 }
 export interface DeleteUserParams {
   clerkId: string;
+}
+
+export interface FollowTagParams {
+  userId: string;
+  tagId: string;
+  action: string;
+  path: string;
 }

@@ -6,8 +6,8 @@ import Link from "next/link";
 interface props {
   title: string;
   description: string;
-  link: string;
-  linkText: string;
+  link?: string;
+  linkText?: string;
 }
 
 const NoResult = ({ title, description, link, linkText }: props) => {
@@ -31,11 +31,13 @@ const NoResult = ({ title, description, link, linkText }: props) => {
       <p className="body-regular text-dark500_light700 max-w-md text-center">
         {description}
       </p>
-      <Link href={link} className="flex">
-        <Button className="primary-gradient min-h-[42px] px-4 py-3 !text-light-900 hover:!text-light-800">
-          {linkText}
-        </Button>
-      </Link>
+      {link && (
+        <Link href={link} className="flex">
+          <Button className="primary-gradient min-h-[42px] px-4 py-3 !text-light-900 hover:!text-light-800">
+            {linkText}
+          </Button>
+        </Link>
+      )}
     </div>
   );
 };

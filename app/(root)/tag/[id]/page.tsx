@@ -1,21 +1,50 @@
 import QuestionsCard from "@/components/cards/QuestionsCard";
+import FollowTag from "@/components/shared/FollowTag";
 import NoResult from "@/components/shared/NoResult";
-import Paginaion from "@/components/shared/Paginaion";
+import Pagination from "@/components/shared/Pagination";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { getQuestionByTagId } from "@/lib/actions/tags.action";
+import { getUser } from "@/lib/actions/user.action";
 import { URLProps } from "@/types";
+import { auth } from "@clerk/nextjs/server";
+import { Metadata } from "next";
 import React from "react";
+export async function generateMetadata({
+  params,
+}: URLProps): Promise<Metadata> {
+  const { tag } = await getQuestionByTagId({
+    tagId: params.id,
+  });
+  return {
+    title: `DevFlow | ${tag.name} Tag`,
+    description: `Explore all questions and discussions related to ${tag.name} on DevFlow. Stay updated with the latest trends, challenges, and solutions in the ${tag.name} community.`,
+  };
+}
 
 const Page = async ({ params, searchParams }: URLProps) => {
-  const { tagName, questions, isNext } = await getQuestionByTagId({
+  const { tag, questions, isNext } = await getQuestionByTagId({
     tagId: params.id,
     searchQuery: searchParams?.q,
     page: searchParams?.page ? +searchParams.page : 1,
   });
+  const { userId: clerkId } = auth();
+  let mongoUser;
+  if (clerkId) {
+    const { user } = await getUser({ userId: clerkId });
+    mongoUser = user;
+  }
+
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900 capitalize">{tagName}</h1>
-
+      <div className="flex items-center justify-between">
+        <h1 className="h1-bold text-dark100_light900 capitalize">{tag.name}</h1>
+        <FollowTag
+          tagId={JSON.stringify(tag?._id)}
+          isFollowing={tag?.followers.includes(mongoUser?._id)}
+          userId={JSON.stringify(mongoUser?._id)}
+          tagName={tag.name}
+        />
+      </div>
       <div className="mt-11 w-full">
         <LocalSearchBar
           route={`/tag/${params.id}`}
@@ -53,7 +82,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
         )}
       </div>
       <div className="mt-10">
-        <Paginaion
+        <Pagination
           pageNumber={searchParams?.page ? +searchParams.page : 1}
           isNext={isNext}
         />

@@ -9,15 +9,41 @@ import Link from "next/link";
 import React from "react";
 import { getAllQuestions } from "@/lib/actions/questions.action";
 import { SearchParamsProps } from "@/types";
-import Paginaion from "@/components/shared/Paginaion";
+import { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
+import { getRecommendedQuestions } from "@/lib/actions/user.action";
+import Pagination from "@/components/shared/Pagination";
+
+export const metadata: Metadata = {
+  title: "DevFlow | Home",
+  description:
+    "Welcome to DevFlow, a collaborative platform for developers to ask questions, share knowledge, and find solutions. Explore the latest programming discussions and stay updated with real-time answers from the community.",
+};
 
 const Home = async ({ searchParams }: SearchParamsProps) => {
-  const { questions, isNext } = await getAllQuestions({
-    searchQuery: searchParams.q,
-    filter: searchParams.filter,
-    page: searchParams.page ? +searchParams.page : 1,
-  });
+  const { userId } = auth();
+  let result;
 
+  if (searchParams?.filter === "recommended") {
+    if (userId) {
+      result = await getRecommendedQuestions({
+        userId,
+        searchQuery: searchParams.q,
+        page: searchParams.page ? +searchParams.page : 1,
+      });
+    } else {
+      result = {
+        questions: [],
+        isNext: false,
+      };
+    }
+  } else {
+    result = await getAllQuestions({
+      searchQuery: searchParams.q,
+      filter: searchParams.filter,
+      page: searchParams.page ? +searchParams.page : 1,
+    });
+  }
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between sm:flex-row sm:items-center">
@@ -44,8 +70,8 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
       </div>
       <HomeFilters />
       <div className="mt-10 flex flex-col gap-6">
-        {questions.length > 0 ? (
-          questions.map((question) => (
+        {result?.questions.length > 0 ? (
+          result?.questions.map((question: any) => (
             <QuestionsCard
               key={question._id}
               _id={question._id}
@@ -70,9 +96,9 @@ const Home = async ({ searchParams }: SearchParamsProps) => {
         )}
       </div>
       <div className="mt-10">
-        <Paginaion
+        <Pagination
           pageNumber={searchParams?.page ? +searchParams.page : 1}
-          isNext={isNext}
+          isNext={result?.isNext}
         />
       </div>
     </>

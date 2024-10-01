@@ -16,7 +16,7 @@ body {
     @apply flex justify-start items-center;
   }
   .card-wrapper {
-    @apply bg-light-900 dark:dark-gradient shadow-lg dark:shadow-dark-100;
+    @apply bg-light-900 dark:dark-gradient shadow-[rgba(50,_50,_105,_0.15)_0px_2px_5px_0px,_rgba(0,_0,_0,_0.05)_0px_1px_1px_0px] dark:shadow-dark-100;
   }
   .btn {
     @apply bg-light-800 dark:bg-dark-300 !important;
@@ -25,7 +25,7 @@ body {
     @apply bg-light-700 dark:bg-dark-400 transition ease-out delay-100 !important;
   }
   .btn-secondary {
-    @apply bg-light-800 dark:bg-dark-400 !important;
+    @apply bg-light-800 dark:bg-dark-400 hover:bg-light-700 dark:hover:bg-dark-300 hover:font-bold !important;
   }
   .btn-tertiary {
     @apply bg-light-700 dark:bg-dark-300 !important;
@@ -117,10 +117,144 @@ word-break: break-all;
   color: inherit !important;
 }
 /* Markdown End */
+
+/*Job Loader Start */
+
+/* From Uiverse.io by alexruix */
+.loader {
+  width: 48px;
+  height: 48px;
+  margin: auto;
+  position: relative;
+}
+
+.loader:before {
+  content: "";
+  width: 48px;
+  height: 5px;
+  /* background: #f0808050; */
+  background: #ff7000;
+  position: absolute;
+  top: 60px;
+  left: 0;
+  border-radius: 50%;
+  animation: shadow324 0.5s linear infinite;
+}
+
+.loader:after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  /* background: #f08080; */
+  background: #ff801f;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 4px;
+  animation: jump7456 0.5s linear infinite;
+}
+
+@keyframes jump7456 {
+  15% {
+    border-bottom-right-radius: 3px;
+  }
+
+  25% {
+    transform: translateY(9px) rotate(22.5deg);
+  }
+
+  50% {
+    transform: translateY(18px) scale(1, 0.9) rotate(45deg);
+    border-bottom-right-radius: 40px;
+  }
+
+  75% {
+    transform: translateY(9px) rotate(67.5deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(90deg);
+  }
+}
+
+@keyframes shadow324 {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+
+  50% {
+    transform: scale(1.2, 1);
+  }
+}
+/* Loader End */
+
+/* Ai Button Styles */
+.ai-button {
+  --transition: 0.3s ease-in-out;
+  transition:
+    transform var(--transition),
+    box-shadow var(--transition);
+  background-color: transparent;
+  border: none;
+  position: relative;
+}
+
+.ai-button:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 0 10px 2px rgba(255, 255, 255, 0.5),
+    0 0 15px 5px rgba(59, 130, 246, 0.5); /* Glow with a primary color accent */
+}
+
+@keyframes pulsate {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+.shadow-glow {
+  box-shadow:
+    0px 4px 10px rgba(59, 130, 246, 0.6),
+    0px 8px 20px rgba(59, 130, 246, 0.3); /* Adjust the color for the glow */
+}
+
+/* Ai Button ends */
+
 /* Clerk */
 .cl-internal-b3fm6y {
   background: linear-gradient(129deg, #ff7000 0%, #e2995f 100%);
 }
+.cl-signUp-root {
+  background-image: var(--auth-background-image);
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cl-signIn-root {
+  background-image: var(--auth-background-image);
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cl-signUp-start {
+  padding: 20px;
+}
+
+/* Clerk style end */
+
 .hash-span {
   margin-top: -140px;
   padding-bottom: 140px;
@@ -134,6 +268,30 @@ word-break: break-all;
 .no-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none;
+}
+
+/* Add this CSS in your global styles or component-specific styles */
+@keyframes blink {
+  0% {
+    background-color: #ff6f0017;
+  }
+  25% {
+    background-color: #ff6f0033;
+  }
+  50% {
+    background-color: #ff6f001e;
+  }
+  75% {
+    background-color: #ff6f0033;
+  }
+  100% {
+    background-color: #ff6f0017;
+  }
+}
+
+.highlight {
+  animation: blink 2s cubic-bezier(0.4, 0, 0.2, 1) 3;
+  transition: background-color 0.5s ease;
 }
 
 @layer base {
@@ -163,6 +321,7 @@ word-break: break-all;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    --auth-background-image: url("/assets/images/auth-light.png");
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -189,6 +348,7 @@ word-break: break-all;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --auth-background-image: url("/assets/images/auth-dark.png");
   }
 }
 @layer base {

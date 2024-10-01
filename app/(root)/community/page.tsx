@@ -1,18 +1,28 @@
-import UserCard from "@/components/cards/UserCard";
 import Filter from "@/components/shared/Filter";
 import NoResult from "@/components/shared/NoResult";
-import Paginaion from "@/components/shared/Paginaion";
+import Pagination from "@/components/shared/Pagination";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { UserFilters } from "@/constants/filters";
 import { getAllUser } from "@/lib/actions/user.action";
 import { SearchParamsProps } from "@/types";
+import { Metadata } from "next";
+import dynamic from "next/dynamic";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "DevFlow | Community",
+  description:
+    "Join the DevFlow community and connect with developers worldwide. Engage in discussions, contribute answers, and collaborate to solve programming challenges.",
+};
 
 const page = async ({ searchParams }: SearchParamsProps) => {
   const { users, isNext } = await getAllUser({
     searchQuery: searchParams.q,
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1,
+  });
+  const UserCard = dynamic(() => import("@/components/cards/UserCard"), {
+    ssr: false,
   });
 
   return (
@@ -45,7 +55,7 @@ const page = async ({ searchParams }: SearchParamsProps) => {
         )}
       </div>
       <div className="mt-10">
-        <Paginaion
+        <Pagination
           pageNumber={searchParams?.page ? +searchParams.page : 1}
           isNext={isNext}
         />
@@ -53,5 +63,4 @@ const page = async ({ searchParams }: SearchParamsProps) => {
     </>
   );
 };
-
 export default page;

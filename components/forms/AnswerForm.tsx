@@ -20,16 +20,21 @@ import { useTheme } from "@/context/ThemeProvider";
 import Image from "next/image";
 import { createAnswer } from "@/lib/actions/answer.action";
 import { usePathname } from "next/navigation";
+import { marked } from "marked";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import toast from "react-hot-toast";
 
 interface params {
   authorId: string;
   questionId: string;
+  question: string;
 }
 
-const AnswerForm = ({ authorId, questionId }: params) => {
+const AnswerForm = ({ authorId, questionId, question }: params) => {
   const editorRef = useRef(null);
   const { mode } = useTheme();
   const [isSubmmitting, setIsSubmitting] = useState(false);
+  const [isAiSubmmitting, setIsAiSubmitting] = useState(false);
   const path = usePathname();
 
   const form = useForm<z.infer<typeof AnswerFromSchema>>({
@@ -41,10 +46,10 @@ const AnswerForm = ({ authorId, questionId }: params) => {
   const handelCreateAnswer = async (
     values: z.infer<typeof AnswerFromSchema>
   ) => {
+    if (!authorId) return toast.error("Please login first ");
     setIsSubmitting(true);
-
+    const toastId = toast.loading("Posting your answer...");
     try {
-      // todo: add validation to check signed in user
       await createAnswer({
         answer: values.answer,
         question: JSON.parse(questionId),
@@ -56,13 +61,41 @@ const AnswerForm = ({ authorId, questionId }: params) => {
         const editor = editorRef.current as any;
         editor.setContent("");
       }
+      toast.dismiss(toastId);
+      toast.success("Answer posted successfully");
     } catch (error) {
-      console.error(error);
-      throw error;
+      toast.dismiss(toastId);
+      toast.error("Failed to post answer");
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const generateAiAnswer = async () => {
+    if (!authorId) return toast.error("Please login first ");
+
+    setIsAiSubmitting(true);
+    try {
+      // Generate an answer using the Gemini Ai
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/api/gemini`,
+        {
+          method: "POST",
+          body: JSON.stringify(question),
+        }
+      );
+      const aiAnswer = await res.json();
+      if (editorRef) {
+        const editor = editorRef.current as any;
+        editor.setContent(marked.parse(aiAnswer));
+      }
+    } catch (error) {
+      toast.error("There was a problem generating answer");
+    } finally {
+      setIsAiSubmitting(false);
+    }
+  };
+
   return (
     <div className="mt-10">
       <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
@@ -70,15 +103,23 @@ const AnswerForm = ({ authorId, questionId }: params) => {
           Write your answer here
           <span className="text-primary-500">*</span>
         </h4>
-        <Button className="btn light-border-2 gap-1.5 rounded-md px-4 py-2.5 text-primary-500 shadow-none  dark:text-primary-500">
+        <Button
+          className={`hover:shadow-glow ai-button relative flex items-center gap-1.5 rounded-md px-4 py-2.5 
+            text-primary-500 shadow-none transition-transform duration-300 ease-in-out
+            hover:scale-105 dark:text-primary-500 ${isAiSubmmitting ? "cursor-wait" : "cursor-pointer"}`}
+          onClick={() => generateAiAnswer()}
+          disabled={isAiSubmmitting}
+        >
           <Image
             src="/assets/icons/stars.svg"
             alt="star"
             width={12}
             height={12}
-            className="object-contain ease-linear hover:animate-pulse"
+            className={`object-contain ease-linear ${
+              isAiSubmmitting ? "animate-pulse" : ""
+            }`}
           />
-          Generate an AI answer
+          {isAiSubmmitting ? "Generating..." : "Generate an AI answer"}
         </Button>
       </div>
       <Form {...form}>
@@ -147,6 +188,10 @@ const AnswerForm = ({ authorId, questionId }: params) => {
               className="primary-gradient w-fit !text-light-900"
               disabled={isSubmmitting}
             >
+              {isSubmmitting && (
+                <ReloadIcon className="mr-2 size-4 animate-spin text-light-900" />
+              )}
+
               {isSubmmitting ? "Submitting..." : "Submit"}
             </Button>
           </div>

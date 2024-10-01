@@ -3,15 +3,28 @@ import AllAnswers from "@/components/shared/AllAnswers";
 import Metric from "@/components/shared/Metric";
 import ParseHTML from "@/components/shared/ParseHTML";
 import RenderTag from "@/components/shared/RenderTag";
+import ScrollToAnswer from "@/components/shared/ScrollToAnswer";
 import Votes from "@/components/shared/Votes";
 import { getQuestionById } from "@/lib/actions/questions.action";
 import { getUser } from "@/lib/actions/user.action";
 import { formatToK, getTimeStamp } from "@/lib/utils";
 import { URLProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
+
+export async function generateMetadata({
+  params,
+}: URLProps): Promise<Metadata> {
+  const { question } = await getQuestionById({ questionId: params.id });
+
+  return {
+    title: `DevFlow | ${question.title}`,
+    description: `Read answers and discussions for the question: "${question.title}". Join the conversation and contribute your expertise.`,
+  };
+}
 
 const Page = async ({ params, searchParams }: URLProps) => {
   const { question } = await getQuestionById({ questionId: params.id });
@@ -21,9 +34,9 @@ const Page = async ({ params, searchParams }: URLProps) => {
     const { user } = await getUser({ userId: clerkId });
     mongoUser = user;
   }
-
   return (
     <>
+      <ScrollToAnswer />
       <div className="flex-start w-full flex-col">
         <div className="flex w-full flex-col-reverse justify-between gap-5 sm:flex-row sm:items-center sm:gap-2">
           <Link
@@ -51,7 +64,7 @@ const Page = async ({ params, searchParams }: URLProps) => {
                 productId={JSON.stringify(question._id)}
                 hasupVoted={question.upvotes.includes(mongoUser?._id)}
                 hasdownVoted={question.downvotes.includes(mongoUser?._id)}
-                hasSaved={mongoUser?.saved.includes(question._id)}
+                hasSaved={mongoUser?.savedQuestions.includes(question._id)}
               />
             )}
           </div>
@@ -95,11 +108,14 @@ const Page = async ({ params, searchParams }: URLProps) => {
         totalAnswers={question.answers.length}
         filter={searchParams.filter}
         page={searchParams.page ? +searchParams.page : 1}
+        mongoUser={JSON.stringify(mongoUser)}
       />
-
       <AnswerForm
         authorId={JSON.stringify(mongoUser?._id)}
         questionId={JSON.stringify(question?._id)}
+        question={JSON.stringify(
+          `${question.title} \n ${question.explanation}`
+        )}
       />
     </>
   );

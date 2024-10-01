@@ -10,7 +10,7 @@ interface props {
   isNext: boolean;
 }
 
-const Paginaion = ({ pageNumber, isNext }: props) => {
+const Pagination = ({ pageNumber, isNext }: props) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const handelNavigation = (direction: string) => {
@@ -49,4 +49,4 @@ const Paginaion = ({ pageNumber, isNext }: props) => {
   );
 };
 
-export default Paginaion;
+export default Pagination;

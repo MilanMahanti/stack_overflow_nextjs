@@ -1,7 +1,7 @@
 import { getUserAnswers } from "@/lib/actions/user.action";
 import React from "react";
 import AnswerCard from "../cards/AnswerCard";
-import Paginaion from "./Paginaion";
+import Pagination from "./Pagination";
 
 interface params {
   searchParams: any;
@@ -20,19 +20,19 @@ const AnswerTab = async ({ searchParams, userId, clerkId }: params) => {
           <AnswerCard
             key={answer._id}
             _id={answer._id}
-            questionId={answer.question._id}
-            title={answer.question.title}
             upvotes={answer.upvotes.length}
             author={answer.author}
             createdAt={answer.createdAt}
             clerkId={clerkId}
+            question={answer.question}
+            answer={answer.answer}
           />
         ))
       ) : (
         <p className="body-medium  text-dark500_light700 ">No answer found</p>
       )}
       <div className="mt-10">
-        <Paginaion
+        <Pagination
           pageNumber={searchParams.page ? +searchParams.page : 1}
           isNext={isNextAnswer}
         />

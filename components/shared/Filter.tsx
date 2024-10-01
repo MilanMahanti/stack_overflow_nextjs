@@ -50,7 +50,11 @@ const Filter = ({ filters, extraClasses, containerClasses }: props) => {
         <SelectContent>
           <SelectGroup>
             {filters.map((filter) => (
-              <SelectItem key={filter.name} value={filter.value}>
+              <SelectItem
+                key={filter.name}
+                value={filter.value}
+                className="cursor-pointer"
+              >
                 {filter.name}
               </SelectItem>
             ))}

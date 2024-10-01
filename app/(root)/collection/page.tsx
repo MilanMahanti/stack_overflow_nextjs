@@ -1,73 +1,43 @@
-import QuestionsCard from "@/components/cards/QuestionsCard";
-import Filter from "@/components/shared/Filter";
-import NoResult from "@/components/shared/NoResult";
-import Paginaion from "@/components/shared/Paginaion";
-import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
-import { QuestionFilters } from "@/constants/filters";
-import { getSavedQuestion, getUser } from "@/lib/actions/user.action";
+import SavedAnswers from "@/components/shared/SavedAnswers";
+import SavedQuestions from "@/components/shared/SavedQuestions";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SearchParamsProps } from "@/types";
 import { auth } from "@clerk/nextjs/server";
+import { Metadata } from "next";
 import { redirect } from "next/navigation";
 import React from "react";
+
+export const metadata: Metadata = {
+  title: "Dev Overflow | Collection",
+  description:
+    "View all the programming questions and answers you've saved on Dev Overflow. Revisit important discussions and follow up on the answers and updates from the community.",
+};
 
 const Page = async ({ searchParams }: SearchParamsProps) => {
   const { userId } = auth();
   if (!userId) redirect("/sign-in");
-  const { user } = await getUser({ userId });
-  if (!user) redirect("/sign-in");
-
-  const { savedQuestions, isNext } = await getSavedQuestion({
-    clerkId: userId,
-    searchQuery: searchParams?.q,
-    filter: searchParams.filter,
-    page: searchParams.page ? +searchParams.page : 1,
-  });
 
   return (
     <>
-      <h1 className="h1-bold text-dark100_light900 mb-6">Saved Questions</h1>
-      <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-        <LocalSearchBar
-          route="/collection"
-          iconPosition="left"
-          imgSrc="/assets/icons/search.svg"
-          extraClasses="flex-1"
-          placeholder="Search questions here..."
-        />
-        <Filter
-          filters={QuestionFilters}
-          extraClasses="min-h-[56px] sm:min-w-[170px]"
-        />
-      </div>
-      <div className="mt-10 flex flex-col gap-6">
-        {savedQuestions?.length > 0 ? (
-          savedQuestions?.map((question: any) => (
-            <QuestionsCard
-              key={question._id}
-              _id={question._id}
-              answers={question.answers.length}
-              title={question.title}
-              author={user}
-              views={question.views}
-              upvotes={question.upvotes.length}
-              createdAt={question.createdAt}
-              tags={question.tags}
-            />
-          ))
-        ) : (
-          <NoResult
-            title="There’s no saved question to show"
-            description="Save questions to get easier access to them later"
-            link="/"
-            linkText="Go back to Home"
-          />
-        )}
-      </div>
+      <h1 className="h1-bold text-dark100_light900 mb-6">Saved Collection</h1>
+
       <div className="mt-10">
-        <Paginaion
-          pageNumber={searchParams?.page ? +searchParams.page : 1}
-          isNext={isNext}
-        />
+        <Tabs defaultValue="saved-questions">
+          <TabsList className="background-light800_dark400 min-h-[42px] p-1">
+            <TabsTrigger value="saved-questions" className="tab">
+              Saved Questions
+            </TabsTrigger>
+            <TabsTrigger value="answers" className="tab">
+              Saved Answers
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="saved-questions" className="flex flex-col gap-4">
+            <SavedQuestions searchParams={searchParams} userId={userId} />
+          </TabsContent>
+          <TabsContent value="answers" className="flex flex-col gap-4">
+            <SavedAnswers searchParams={searchParams} userId={userId} />
+          </TabsContent>
+        </Tabs>
       </div>
     </>
   );

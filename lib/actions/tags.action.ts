@@ -2,6 +2,7 @@
 
 import Tag, { ITag } from "@/database/tag.model";
 import {
+  FollowTagParams,
   GetAllTagsParams,
   GetQuestionsByTagIdParams,
   GetTopInteractedTagsParams,
@@ -10,10 +11,12 @@ import { dbConnect } from "../mongoose";
 import User from "@/database/user.model";
 import Question from "@/database/question.model";
 import { FilterQuery } from "mongoose";
+import { revalidatePath } from "next/cache";
+import Interaction from "@/database/interaction.model";
 
 export async function getTag(params: any) {
   try {
-    dbConnect();
+    await dbConnect();
     const { _id } = params;
     const tag = await Tag.findById(_id);
     return tag;
@@ -24,7 +27,7 @@ export async function getTag(params: any) {
 }
 export async function getAllTags(params: GetAllTagsParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { searchQuery, filter, page = 1, pageSize = 10 } = params;
     const skipAmount = (page - 1) * pageSize;
     const query: FilterQuery<typeof Tag> = {};
@@ -68,16 +71,56 @@ export async function getAllTags(params: GetAllTagsParams) {
 }
 export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { userId } = params;
     const user = await User.findById(userId);
     if (!user) {
       throw new Error("User not found");
     }
 
-    // todo: make interections collection in db to fetch actual top interactions
+    const topTags = await Interaction.aggregate([
+      {
+        $match: { user: userId },
+      },
+      {
+        $unwind: "$tags", // Unwind the array of tags
+      },
+      {
+        $group: {
+          _id: "$tags", // Group by tag ID
+          count: { $sum: 1 }, // Count occurrences of each tag
+        },
+      },
+      {
+        $sort: { count: -1 },
+      },
+      {
+        $limit: 3,
+      },
+      {
+        $lookup: {
+          from: "tags",
+          localField: "_id",
+          foreignField: "_id",
+          as: "tagDetails",
+        },
+      },
+      {
+        $unwind: "$tagDetails",
+      },
+      {
+        $project: {
+          _id: 0,
+          tagId: "$_id",
+          tagName: "$tagDetails.name",
+        },
+      },
+    ]);
 
-    return ["Next.js", "HTML", "CSS"];
+    return topTags.map((tag: { tagId: string; tagName: string }) => ({
+      id: tag.tagId,
+      name: tag.tagName,
+    }));
   } catch (error) {
     console.log(error);
     throw error;
@@ -85,7 +128,7 @@ export async function getTopInteractedTags(params: GetTopInteractedTagsParams) {
 }
 export async function getTopTags() {
   try {
-    dbConnect();
+    await dbConnect();
     const topTags = await Tag.aggregate([
       {
         $project: { name: 1, numOfQuestions: { $size: "$questions" } },
@@ -105,7 +148,7 @@ export async function getTopTags() {
 }
 export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
   try {
-    dbConnect();
+    await dbConnect();
     const { tagId, page = 1, pageSize = 10, searchQuery } = params;
     const skipAmount = (page - 1) * pageSize;
     const tagFilter: FilterQuery<ITag> = { _id: tagId };
@@ -136,9 +179,28 @@ export async function getQuestionByTagId(params: GetQuestionsByTagIdParams) {
 
     if (!tag) throw new Error("No tag found");
     const isNext = tag.questions.length > pageSize;
-    return { tagName: tag.name, questions: tag.questions, isNext };
+    return { tag, questions: tag.questions, isNext };
   } catch (error) {
     console.error(error);
     throw error;
+  }
+}
+
+export async function followTag(params: FollowTagParams) {
+  try {
+    await dbConnect();
+    const { userId, tagId, action, path } = params;
+    let updateQuery = {};
+
+    if (action === "follow") {
+      updateQuery = { $push: { followers: userId } };
+    } else if (action === "unfollow") {
+      updateQuery = { $pull: { followers: userId } };
+    }
+
+    await Tag.findByIdAndUpdate(tagId, updateQuery);
+    revalidatePath(path);
+  } catch (error) {
+    console.log(error);
   }
 }

@@ -2,7 +2,7 @@ import Navbar from "@/components/shared/navbar/Navbar";
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import RightSidebar from "@/components/shared/sidebar/RightSidebar";
 import React from "react";
-
+import { Toaster } from "react-hot-toast";
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <main className="background-light850_dark100 relative">
@@ -14,7 +14,13 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         </section>
         <RightSidebar />
       </div>
-      {/* Toaster */}
+      <Toaster
+        toastOptions={{
+          className:
+            "background-light800_dark400 text-dark200_light800 px-4 py-4 rounded-md",
+          duration: 1500,
+        }}
+      />
     </main>
   );
 };
