@@ -19,6 +19,7 @@ const spaceGrotesk = Space_Grotesk({
 });
 export const metadata: Metadata = {
   title: "DevFlow",
+  metadataBase: new URL("https://dev-overflow-nextjs-milan.vercel.app"),
   description:
     "**DevFlow** is a Next.js-powered web application designed for developers to ask and answer programming-related questions, similar to Stack Overflow. It features user authentication, dynamic routing, and a modern, responsive UI. With robust search functionality and real-time updates, DevFlow provides an intuitive platform for developers to collaborate, share knowledge, and solve coding challenges efficiently.",
   icons: {
