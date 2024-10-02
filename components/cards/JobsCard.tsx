@@ -79,7 +79,7 @@ const JobsCard = ({
           <div className="mt-4 flex w-full justify-between max-sm:flex-col-reverse">
             <Link
               href={url}
-              target="  _blank"
+              target="_blank"
               className="body-semibold group flex items-center gap-2 justify-self-end text-primary-500"
             >
               View Job{" "}

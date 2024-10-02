@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     title: "DevFlow",
     description:
       "A developer-focused web app for asking and answering coding questions. Built on Next.js with real-time features and robust search functionality.",
-    url: "https://stack-overflow-nextjs-beige.vercel.app/",
+    url: "https://dev-overflow-nextjs-milan.vercel.app/",
     images: [
       {
         url: "/assets/images/optimized-logo.jpg",

@@ -9,10 +9,11 @@ import {
 } from "@/components/ui/sheet";
 import Image from "next/image";
 import Link from "next/link";
-import { SignedOut } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignOutButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { sidebarLinks } from "@/constants";
 import { usePathname } from "next/navigation";
+import { ExitIcon } from "@radix-ui/react-icons";
 
 const NavContent = () => {
   const pathName = usePathname();
@@ -57,9 +58,10 @@ const MobileNav = () => {
           className="invert-colors sm:hidden"
         />
       </SheetTrigger>
+
       <SheetContent
         side="left"
-        className="background-light900_dark200 border-none"
+        className="background-light900_dark200 no-scrollbar overflow-y-auto border-none"
       >
         <Link href="/" className="flex items-center gap-1">
           <Image
@@ -77,7 +79,7 @@ const MobileNav = () => {
             <NavContent />
           </SheetClose>
           <SignedOut>
-            <div className="flex flex-col gap-3">
+            <div className="mt-4 flex flex-col gap-3">
               <SheetClose asChild>
                 <Link href="/sign-in">
                   <Button className="small-medium btn-secondary min-h-[42px] w-full rounded-lg px-4 py-3 shadow-none">
@@ -94,6 +96,14 @@ const MobileNav = () => {
               </SheetClose>
             </div>
           </SignedOut>
+          <SignedIn>
+            <SignOutButton>
+              <Button className="small-medium light-border-2 btn-tertiary text-dark400_light800 mt-4 flex min-h-[42px] w-full gap-3  rounded-lg px-4 py-3 shadow-none">
+                <ExitIcon width={20} height={20} />
+                <span className="base-medium"> Logout </span>
+              </Button>
+            </SignOutButton>
+          </SignedIn>
         </div>
       </SheetContent>
     </Sheet>
