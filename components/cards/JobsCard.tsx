@@ -40,21 +40,21 @@ const JobsCard = ({
           />
         </div>
 
-        <div>
-          <div className="flex items-start justify-between gap-3">
-            <h2 className="base-semibold text-dark200_light900 line-clamp-2 flex-1">
+        <div className="w-full">
+          <div className="flex items-start justify-between gap-3 max-sm:flex-col-reverse">
+            <h2 className="base-semibold text-dark200_light900 line-clamp-2  flex-1">
               {role}
             </h2>
             <p className="body-medium background-light800_dark300 hover:background-light700_dark400 card-custom-shadow max-h-fit w-fit grow-0 rounded-md border-none px-2 py-1 capitalize text-primary-500 transition-colors ease-linear">
               {company_name}
             </p>
           </div>
-          <p className="body-regular text-dark500_light700 my-4">
+          <p className="body-regular text-dark500_light700 my-4 line-clamp-4 break-words">
             {extractTextFromHTML(text)}
           </p>
           <div className="mb-2 flex flex-wrap gap-3">
             {keywords.length > 0 && keywords.length > 5
-              ? keywords.slice(0, 5).map((tag, i) => (
+              ? keywords.slice(0, 4).map((tag, i) => (
                   <Badge
                     className="subtle-medium background-light800_dark300 text-light400_light500 hover:background-light700_dark400 card-custom-shadow rounded-md border-none px-4 py-2 uppercase transition-colors ease-linear"
                     key={i}
